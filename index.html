@@ -135,6 +135,30 @@ ul.tight{margin:6px 0;padding-left:20px}
 }
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom, 0px));transform:translate(-50%,20px);background:var(--nav);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:calc(100% - 32px)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:640px){
+  main table, main thead, main tbody, main tr, main td{display:block;width:100%}
+  main thead{display:none}
+  main tr{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin-bottom:10px;background:var(--panel)}
+  main td{border:0;padding:5px 0 5px 5.6em;position:relative;text-align:left!important;min-height:1.6em}
+  main td::before{content:attr(data-label);position:absolute;left:0;top:5px;width:5em;color:var(--ink3);font-size:12.5px;line-height:1.5}
+  main td[data-label=""]{padding-left:0}
+  main td[data-label=""]::before{display:none}
+  main td input,main td select{width:100%}
+  main .tw{overflow-x:visible}
+  main table:not(.edit) tr{display:flex;flex-wrap:wrap;gap:4px 16px;padding:10px 12px}
+  main table:not(.edit) td{width:auto;flex:0 1 auto;max-width:100%;padding:0;min-height:0}
+  main table:not(.edit) td::before{position:static;display:inline;width:auto;margin-right:6px}
+  main table:not(.edit) td:first-child{flex-basis:100%}
+  main table.edit tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 10px;padding:10px 12px}
+  main table.edit td{padding:0;min-height:0}
+  main table.edit td::before{position:static;display:block;width:auto;margin-bottom:3px}
+  main table.edit td:first-child{grid-column:1/-1}
+  #a1tbl tr{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #a1tbl td:first-child{grid-column:auto}
+  #a1tbl td:nth-child(2){grid-column:1/-1;order:-1}
+  #a1tbl td:last-child{align-self:end}
+  #b6tbl td:last-child{align-self:end;font-size:16px}
+}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -216,7 +240,7 @@ ul.tight{margin:6px 0;padding-left:20px}
     <div class="flow"><span>部门填痛点</span><em>→</em><span>算每周耗时</span><em>→</em><span>AI 评可行性与方案</span><em>→</em><span>按公式排序</span><em>→</em><span>先做 / 第二批 / 暂缓</span></div>
     <div class="card">
       <h3>痛点清单</h3>
-      <div class="tw"><table id="a1tbl"><thead><tr><th style="min-width:80px">部门</th><th style="min-width:240px">重复性工作</th><th style="width:96px">单次耗时（分钟）</th><th style="width:96px">每周次数</th><th style="width:120px">涉及数据</th><th></th></tr></thead><tbody></tbody></table></div>
+      <div class="tw"><table id="a1tbl" class="edit"><thead><tr><th style="min-width:80px">部门</th><th style="min-width:240px">重复性工作</th><th style="width:96px">单次耗时（分钟）</th><th style="width:96px">每周次数</th><th style="width:120px">涉及数据</th><th></th></tr></thead><tbody></tbody></table></div>
       <div class="btns">
         <button class="btn ghost sm" onclick="A1.add()">加一行</button>
         <button class="btn ghost sm" onclick="A1.fill()">填入示例（名车门店）</button>
@@ -362,7 +386,7 @@ ul.tight{margin:6px 0;padding-left:20px}
     <div class="flow"><span>指标</span><em>→</em><span>本地计算涨跌幅</span><em>→</em><span>AI 找异动、推测原因</span><em>→</em><span>群消息</span></div>
     <div class="card">
       <h3>今日指标 <span class="pill p-warn">示例数据</span></h3>
-      <div class="tw"><table id="b6tbl"><thead><tr><th>指标</th><th style="width:110px">昨日</th><th style="width:110px">今日</th><th>单位</th><th class="num">变化</th></tr></thead><tbody></tbody></table></div>
+      <div class="tw"><table id="b6tbl" class="edit"><thead><tr><th>指标</th><th style="width:110px">昨日</th><th style="width:110px">今日</th><th>单位</th><th class="num">变化</th></tr></thead><tbody></tbody></table></div>
       <label>当日事件（选填）</label>
       <textarea id="b6n" style="min-height:70px"></textarea>
       <div class="btns">
@@ -409,7 +433,7 @@ ul.tight{margin:6px 0;padding-left:20px}
         <div><label>输出单价（元 / 百万 token）</label><input id="d1pout" type="number" step="0.1"></div>
         <div><label>每月工作天数</label><input id="d1days" type="number"></div>
       </div>
-      <div class="tw" style="margin-top:10px"><table id="d1tbl"><thead><tr><th>工具</th><th style="width:100px">每天调用</th><th style="width:110px">每次输入 token</th><th style="width:110px">每次输出 token</th><th class="num">月成本（元）</th></tr></thead><tbody></tbody></table></div>
+      <div class="tw" style="margin-top:10px"><table id="d1tbl" class="edit"><thead><tr><th>工具</th><th style="width:100px">每天调用</th><th style="width:110px">每次输入 token</th><th style="width:110px">每次输出 token</th><th class="num">月成本（元）</th></tr></thead><tbody></tbody></table></div>
       <div id="d1sum" class="out"></div>
       <div class="btns"><button class="btn ghost sm" onclick="D1.reset()">恢复示例参数</button><span style="flex:1"></span><button class="btn ghost sm" onclick="D1.compare()">对比：如果不做本地检索、整表发给 AI</button></div>
       <div id="d1cmp" class="out"></div>
@@ -782,7 +806,7 @@ const CACHE = {
     {id:'TZ-002', reason:'矿石白，不符合颜色要求；而且车源库定位偏运动操控，和“安全、后排空间”的需求不太匹配。'}
   ], wechat:'[姓名1]您好！按您说的预算 25-30 万、家用 SUV、看重安全和后排空间，我们店里有两台很合适：\n1. 沃尔沃 XC60 B5 四驱智远豪华版，2022 年，2.8 万公里，银河灰，27.5 万。城市安全系统、自动紧急制动都有，四驱跑青城山也稳。\n2. 奔驰 GLC 300L 豪华型，2022 年，2.6 万公里，曜岩黑，29.8 万。后排宽敞，带 360 影像和电动尾门，接送孩子很方便。\n两台都是一手车，第三方检测无事故，检测报告我可以先发给您。您这周末方便带家人来试驾吗？', ask:['孩子多大？是否需要安装儿童安全座椅（ISOFIX）？','是否考虑新能源？家里或单位能不能装充电桩？','有没有旧车需要置换？']},
   b2:{reply:'理解您的顾虑，比价是应该的。这台 XC60 是一手车，有 4S 店完整保养记录和第三方检测报告（无事故、无泡水、无火烧），我现在就把报告发您，您也可以带到自己信任的检测机构复检。价格方面，同款车差价通常来自车况、手续和质保，我先帮您向店长申请一下，有结果马上告诉您。这周末您有空的话，可以带家人来试驾看看。', used:['嫌贵砍价','担心车况'], emotion:'有明确购买意向，但对价格和车况都有顾虑；“这周就定”是在争取优惠。', tips:['不要直接答应便宜两万，优惠超过 3000 元需要走价格特批','主动发检测报告，不要说“绝对没问题”','不要评价“别家”的车，只讲自己这台车的依据']},
-  b3:{explain:'[客户]您好，按 XC60 车价 27.5 万、首付 30%、分 36 期、年化利率 4.5%（示例利率，以审批为准）给您算了一下：\n- 首付 8.25 万，贷款 19.25 万\n- 每月还款约 5,726.28 元，在您说的 7000 元以内\n- 36 期总利息约 13,646.19 元，没有额外服务费\n如果想月供再低一些，可以选 48 期，月供约 4,389.67 元，但总利息会增加到约 18,204.21 元；如果想少付利息，选 24 期，月供约 8,402.20 元，总利息约 9,152.89 元。\n最终能贷多少、利率多少，以金融机构审批结果为准，我可以帮您先做个预审。', fit:'36 期月供 5,726.28 元，满足“月供不超过 7000”；如果客户更在意少付利息，24 期会超出月供预算。', compliance:['说明里已写明“以金融机构审批结果为准”，不能改成“包过”','如果实际有 GPS 费、服务费等，必须写进总费用，不能只报月供','利率是示例值，正式报价前和金融专员确认当月政策']},
+  b3:{explain:'您好，按 XC60 车价 27.5 万、首付 30%、分 36 期、年化利率 4.5%（示例利率，以审批为准）给您算了一下：\n- 首付 8.25 万，贷款 19.25 万\n- 每月还款约 5,726.28 元，在您说的 7000 元以内\n- 36 期总利息约 13,646.19 元，没有额外服务费\n如果想月供再低一些，可以选 48 期，月供约 4,389.67 元，但总利息会增加到约 18,204.21 元；如果想少付利息，选 24 期，月供约 8,402.20 元，总利息约 9,152.89 元。\n最终能贷多少、利率多少，以金融机构审批结果为准，我可以帮您先做个预审。', fit:'36 期月供 5,726.28 元，满足“月供不超过 7000”；如果客户更在意少付利息，24 期会超出月供预算。', compliance:['说明里已写明“以金融机构审批结果为准”，不能改成“包过”','如果实际有 GPS 费、服务费等，必须写进总费用，不能只报月供','利率是示例值，正式报价前和金融专员确认当月政策']},
   b4:{answer:'不能直接答应。根据《优惠审批》：销售可直接给予的优惠不超过 3000 元，3000-10000 元需要店长审批。8000 元属于店长审批范围，请在企业微信「审批 → 价格特批」提交，审批通过前不要向客户口头承诺。\n\n提成方面，根据《销售提成》：每台车提成 = 该车毛利 × 8%，当月交车满 5 台的部分按 10% 计；提成按交车结算，次月 15 日发放。\n\n另外，如果客户办理合作机构贷款并成功放款，根据《金融奖励》每单额外奖励 500 元。', sources:['优惠审批','销售提成','金融奖励'], found:true},
   b5:{level:'高风险 · 不建议发布', issues:[
     {quote:'全成都最低价', problem:'绝对化用语，违反《广告法》。', fix:'删除，改为“价格透明，欢迎比价”。'},
@@ -992,7 +1016,7 @@ const B3 = {
       $('b3out').innerHTML = `<div class="card">${this.table(c)}</div><div class="card loading"><div class="spin"></div>AI 正在写客户说明…</div>`;
       try{
         const nums = c.list.map(p => `${p.n} 期：首付 ${yuan(p.down)} 元，贷款 ${yuan(p.loan)} 元，月供 ${yuan(p.m)} 元，总利息 ${yuan(p.interest)} 元，服务费 ${yuan(p.fee)} 元`).join('\n');
-        const sys = `你是汽车金融专员的助手。下面的数字已经由程序算好，你只能原样引用，不得重新计算或修改。车价 ${$('b3p').value} 万，首付比例 ${Math.round(+$('b3d').value * 100)}%，年化利率 ${$('b3r').value}%（示例利率，以审批为准），客户当前选择 ${c.main.n} 期。\n${nums}\n请根据客户关注点写一段发给客户的微信说明，用“[客户]”称呼客户；必须写明“以金融机构审批结果为准”，不得出现包过、零首付无条件等表述。只输出 JSON：{"explain":"给客户的说明，可以用短列表","fit":"当前方案是否满足客户关注点，一句话","compliance":["合规提醒，2-3 条"]}`;
+        const sys = `你是汽车金融专员的助手。下面的数字已经由程序算好，你只能原样引用，不得重新计算或修改。车价 ${$('b3p').value} 万，首付比例 ${Math.round(+$('b3d').value * 100)}%，年化利率 ${$('b3r').value}%（示例利率，以审批为准），客户当前选择 ${c.main.n} 期。\n${nums}\n请根据客户关注点写一段发给客户的微信说明，用“您”称呼客户；必须写明“以金融机构审批结果为准”，不得出现包过、零首付无条件等表述。只输出 JSON：{"explain":"给客户的说明，可以用短列表","fit":"当前方案是否满足客户关注点，一句话","compliance":["合规提醒，2-3 条"]}`;
         const r = await ai('b3', sys, '客户关注点：' + ($('b3c').value.trim() || '无'), this.isSample());
         const d = r.data; this.msg = d.explain || '';
         $('b3out').innerHTML = `<div class="card">${this.table(c)}</div><div class="card">${maskNote(r)}
@@ -1288,6 +1312,17 @@ const Story = {
 $('storyBtn').onclick = () => Story.start();
 $('stNext').onclick = () => Story.next(); $('stPrev').onclick = () => Story.prev(); $('stRun').onclick = () => Story.run(); $('stExit').onclick = () => Story.exit();
 
+
+/* ================= 手机端：表格改成卡片，给每个单元格补上列名 ================= */
+function labelTables(){
+  document.querySelectorAll('main table').forEach(t => {
+    const hs = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    if(!hs.length) return;
+    t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => { const l = hs[i] || ''; if(td.dataset.label !== l) td.dataset.label = l; }));
+  });
+}
+let _lt; new MutationObserver(() => { clearTimeout(_lt); _lt = setTimeout(labelTables, 30); }).observe(document.querySelector('main'), {childList:true, subtree:true});
+labelTables();
 /* ================= 启动 ================= */
 go(S.get('tab', 'home'));
 
