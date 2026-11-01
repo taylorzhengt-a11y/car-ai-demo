@@ -1,0 +1,1296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汽车销售 AI 助手台</title>
+<style>
+:root{
+  --bg:#f3f5f8;--panel:#fff;--ink:#142033;--ink2:#5a6678;--ink3:#8a94a4;--line:#e1e6ed;
+  --nav:#0e1b33;--nav2:#1b2b4b;--navink:#c3cde0;
+  --acc:#c2410c;--accbg:#fdeee4;--acc2:#9a3412;
+  --bad:#c0392b;--badbg:#fdecea;--warn:#b45309;--warnbg:#fff3df;--ok:#1f7a4d;--okbg:#e6f4ec;--info:#2557c7;--infobg:#e8effc;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif}
+.app{display:flex;min-height:100vh}
+nav{width:240px;flex-shrink:0;background:var(--nav);color:var(--navink);padding:20px 12px 30px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{color:#fff;font-weight:700;font-size:17px;padding:0 10px;line-height:1.4}
+.brand small{display:block;font-weight:400;font-size:12px;color:#8592ad;margin-top:4px}
+.group{margin:18px 10px 4px;font-size:11.5px;color:#7884a0;letter-spacing:1px}
+nav button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--navink);padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer}
+nav button:hover{background:var(--nav2);color:#fff}
+nav button.on{background:var(--acc);color:#fff}
+nav button .k{font-size:11px;color:#7884a0}
+nav button.on .k{color:#d5f0f2}
+main{flex:1;min-width:0;padding:0 36px 90px}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:14px 0 12px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.top .sp{flex:1}
+.sw{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2);cursor:pointer;user-select:none}
+.sw input{display:none}
+.sw i{width:36px;height:20px;border-radius:20px;background:#c9d0da;position:relative;transition:.2s;flex-shrink:0}
+.sw i:after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+i{background:var(--acc)}
+.sw input:checked+i:after{left:18px}
+.sw b{color:var(--ink);font-weight:600}
+.story{display:none;background:var(--nav);color:#e6ebf4;border-radius:var(--r);padding:14px 18px;margin:-8px 0 22px;position:sticky;top:58px;z-index:4;box-shadow:0 6px 18px rgba(14,27,51,.18)}
+.story.on{display:block}
+.story .st{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.story .stp{font-size:12px;background:var(--acc);color:#fff;padding:1px 8px;border-radius:20px}
+.story h4{margin:0;font-size:15px;color:#fff}
+.story p{margin:6px 0 10px;font-size:14px;color:#c9d2e3}
+.story .dots{display:flex;gap:4px;margin-left:auto}
+.story .dots span{width:18px;height:4px;border-radius:2px;background:#33456b}
+.story .dots span.on{background:#f08a4b}
+.story .btn{padding:6px 14px;font-size:13.5px}
+section{display:none}section.on{display:block}
+h1{font-size:23px;margin:0 0 4px}
+.sub{color:var(--ink2);margin:0 0 18px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;margin:-6px 0 18px}
+.flow span{background:#fff;border:1px solid var(--line);padding:2px 10px;border-radius:20px;color:var(--ink2)}
+.flow em{font-style:normal;color:var(--ink3)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:16px}
+.card h3{margin:0 0 10px;font-size:16px}
+label{display:block;font-weight:600;font-size:13px;margin:10px 0 6px;color:var(--ink2)}
+textarea,input,select{width:100%;font:inherit;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+textarea{min-height:130px;resize:vertical}
+textarea:focus,input:focus,select:focus{outline:2px solid #9fd6da;border-color:var(--acc)}
+.row{display:flex;gap:14px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{border:0;border-radius:8px;padding:9px 18px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;background:var(--acc);color:#fff}
+.btn:hover{background:var(--acc2)}.btn:disabled{opacity:.55;cursor:wait}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:#f6f8fb}
+.btn.dark{background:var(--ink)}
+.btn.sm{padding:5px 12px;font-size:13px}
+.note{font-size:13px;color:var(--ink2)}
+.muted{color:var(--ink3)}
+.out:empty{display:none}
+.out{margin-top:16px;scroll-margin-top:240px}
+.loading{display:flex;align-items:center;gap:10px;color:var(--ink2)}
+.spin{width:18px;height:18px;border:2px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{background:var(--badbg);color:var(--bad);border-radius:8px;padding:12px 14px;white-space:pre-wrap;font-size:14px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:1px 9px;border-radius:20px;line-height:1.7;white-space:nowrap}
+.p-bad{background:var(--badbg);color:var(--bad)}.p-warn{background:var(--warnbg);color:var(--warn)}.p-ok{background:var(--okbg);color:var(--ok)}.p-info{background:var(--infobg);color:var(--info)}.p-acc{background:var(--accbg);color:var(--acc2)}
+.mask-note{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--accbg);color:var(--acc2);font-size:13px;border-radius:8px;padding:7px 12px;margin-bottom:12px}
+.mask-note button{background:none;border:0;color:var(--acc2);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+.seen{display:none;background:#f7f9fb;border:1px dashed var(--line);border-radius:8px;padding:10px 12px;font-size:13px;white-space:pre-wrap;margin-bottom:12px;color:var(--ink2)}
+.tok{background:#fde3d3;color:var(--acc2);border-radius:4px;padding:0 3px;font-weight:600}
+.hl{background:#fde2b8;border-radius:3px;padding:0 2px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12.5px;color:var(--ink2);font-weight:600;background:#f7f9fb}
+.tw{overflow-x:auto}
+td input,td select{padding:6px 8px;font-size:13.5px}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:8px;border-radius:4px;background:var(--acc);min-width:2px}
+.barw{background:#eef1f5;border-radius:4px;width:100%;max-width:220px}
+.fb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink2);border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.fb button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:2px 12px;font:inherit;font-size:13px;cursor:pointer}
+.fb button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.fb input{width:auto;flex:1;min-width:160px;padding:4px 8px;font-size:13px}
+details.fs{margin-top:16px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--info);border-radius:8px;padding:10px 14px}
+details.fs summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--info)}
+details.fs ol{margin:8px 0 2px;padding-left:20px;font-size:14px}
+details.fs li{margin:3px 0}
+.reply{background:#f7f9fb;border-left:3px solid var(--acc);border-radius:6px;padding:12px 14px;white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.duty{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.duty .dn{font-size:12px;color:var(--ink3);letter-spacing:.5px}
+.duty h4{margin:0;font-size:15px}
+.duty .tl{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.duty .tl button{text-align:left;background:var(--accbg);border:0;border-radius:8px;padding:7px 10px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.duty .tl button:hover{background:#fbd9c4}
+.duty .tl button b{display:block;font-size:14px;color:var(--acc2)}
+.hero{background:var(--nav);color:#dfe6f2;border-radius:var(--r);padding:22px 24px;margin-bottom:18px}
+.hero h1{color:#fff}
+.hero p{margin:6px 0 14px;color:#b9c4d8}
+.kpis{scroll-margin-top:240px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .v{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12.5px;color:var(--ink2)}
+.q{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.q .opts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.q .opts button{text-align:left;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer}
+.q .opts button.right{background:var(--okbg);border-color:var(--ok)}
+.q .opts button.wrong{background:var(--badbg);border-color:var(--bad)}
+.q .ex{display:none;margin-top:8px;font-size:13.5px;color:var(--ink2)}
+.q.done .ex{display:block}
+.score{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.score .big{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.feishu{background:#f7f9fb;border:1px solid var(--line);border-radius:8px;padding:12px 14px;white-space:pre-wrap;font-size:14px}
+ul.tight{margin:6px 0;padding-left:20px}
+.disc{font-size:12.5px;color:var(--ink3);margin-top:8px}
+@media (max-width:860px){
+  .app{flex-direction:column}
+  nav{width:100%;height:auto;position:static;padding:12px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap}
+  nav .brand,nav .group{display:none}
+  nav button{width:auto;flex-shrink:0}
+  nav button .k{display:none}
+  main{padding:0 16px 80px}
+  .story{top:0;position:static}
+}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom, 0px));transform:translate(-50%,20px);background:var(--nav);color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:calc(100% - 32px)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+</style>
+</head>
+
+<body>
+<div class="app">
+<nav id="nav">
+  <div class="brand">汽车销售 AI 助手台<small>同展名车汇 AI 搭建师 · 面试演示版</small></div>
+  <button data-go="home">全景首页</button>
+  <div class="group">需求挖掘</div>
+  <button data-go="a1">AI 机会评估表 <span class="k">各部门</span></button>
+  <div class="group">销售 · 车源</div>
+  <button data-go="b1">车源智能查询 <span class="k">销售</span></button>
+  <button data-go="b2">销售话术助手 <span class="k">销售</span></button>
+  <button data-go="b5">营销文案合规 <span class="k">市场</span></button>
+  <div class="group">金融 · 人事 · 财务</div>
+  <button data-go="b3">金融方案助手 <span class="k">金融</span></button>
+  <button data-go="b4">制度问答机器人 <span class="k">人事 · 财务</span></button>
+  <button data-go="b6">销售日报 <span class="k">管理层</span></button>
+  <div class="group">培训赋能</div>
+  <button data-go="c1">新人培训题库 <span class="k">培训</span></button>
+  <div class="group">成本与安全</div>
+  <button data-go="d1">API 成本与调用日志 <span class="k">成本</span></button>
+  <div class="group">效果度量</div>
+  <button data-go="e1">效果看板 <span class="k">汇报</span></button>
+  <div class="group">配置</div>
+  <button data-go="set">设置与模型选型</button>
+</nav>
+
+<main>
+  <div class="top">
+    <label class="sw" title="打开时，示例数据直接显示预置结果，不调用 AI"><input type="checkbox" id="swQuick"><i></i><span><b>快速演示模式</b> <span id="quickHint"></span></span></label>
+    <label class="sw" title="打开时，发给 AI 之前先把客户姓名、手机号、身份证号、银行卡号替换成代号"><input type="checkbox" id="swMask"><i></i><span><b>发送前脱敏</b></span></label>
+    <span class="sp"></span>
+    <button class="btn dark sm" id="storyBtn">开始故事线演示</button>
+  </div>
+
+  <div class="story" id="story">
+    <div class="st"><span class="stp" id="stStep"></span><h4 id="stTitle"></h4><div class="dots" id="stDots"></div></div>
+    <p id="stSay"></p>
+    <div class="btns" style="margin-top:0">
+      <button class="btn ghost sm" id="stPrev">上一步</button>
+      <button class="btn sm" id="stRun">运行这一步</button>
+      <button class="btn ghost sm" id="stNext">下一步</button>
+      <button class="btn ghost sm" id="stExit">退出故事线</button>
+    </div>
+  </div>
+
+  <!-- ============ 首页 ============ -->
+  <section id="home">
+    <div class="hero">
+      <h1>汽车销售 AI 助手台</h1>
+      <p>为名车销售门店设计的 9 个 AI 工具，覆盖销售、车源、金融、人事、财务五个板块，按岗位职责的 5 条组织。所有车源、客户、制度数据均为虚构示例；涉及客户信息的内容发给 AI 前先在本机脱敏。</p>
+      <div class="btns"><button class="btn" onclick="Story.start()">开始故事线演示（约 10 分钟）</button><button class="btn ghost sm" onclick="go('d1')" style="background:transparent;color:#dfe6f2;border-color:#3a4b6e">先看 API 成本测算</button></div>
+    </div>
+    <div class="grid" id="duties"></div>
+    <div class="card" style="margin-top:16px">
+      <h3>三条设计原则</h3>
+      <ul class="tight">
+        <li><b>降低幻觉：</b>车源、话术、制度都先从知识库检索，AI 只能根据检索到的内容回答；月供等数字由本地程序计算，AI 只负责解释。查不到就说查不到，转人工。</li>
+        <li><b>控制成本：</b>能本地做的不调用 AI（检索、计算、禁用词扫描）；只把检索到的几条资料发给模型，不整表上传；日常任务用价格低的模型。</li>
+        <li><b>先出 MVP：</b>每个工具都能先用 Coze / Dify 在一两天内搭出可用版本，小范围试用、按“有用 / 没用”反馈迭代。每个工具下方都写了正式版怎么搭。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>三个演示用法</h3>
+      <ul class="tight">
+        <li><b>只有 5 分钟：</b>看完这一页，再演示车源查询 → 金融方案 → API 成本三个工具。</li>
+        <li><b>有 10 分钟以上：</b>点「开始故事线演示」，按“一位客户从问车到成交”的一天走完 9 步。</li>
+        <li><b>面试官想自己试：</b>关掉顶部「快速演示模式」，在设置里填好 Key，任意输入内容实时调用 AI。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ A1 机会评估 ============ -->
+  <section id="a1">
+    <h1>AI 机会评估表</h1>
+    <p class="sub">入职第一周，请各部门填写日常重复工作，AI 判断能不能做、用什么工具做，系统按“每周耗时 × 可行性 × 数据系数”排出先做什么。</p>
+    <div class="flow"><span>部门填痛点</span><em>→</em><span>算每周耗时</span><em>→</em><span>AI 评可行性与方案</span><em>→</em><span>按公式排序</span><em>→</em><span>先做 / 第二批 / 暂缓</span></div>
+    <div class="card">
+      <h3>痛点清单</h3>
+      <div class="tw"><table id="a1tbl"><thead><tr><th style="min-width:80px">部门</th><th style="min-width:240px">重复性工作</th><th style="width:96px">单次耗时（分钟）</th><th style="width:96px">每周次数</th><th style="width:120px">涉及数据</th><th></th></tr></thead><tbody></tbody></table></div>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="A1.add()">加一行</button>
+        <button class="btn ghost sm" onclick="A1.fill()">填入示例（名车门店）</button>
+        <span class="sp" style="flex:1"></span>
+        <button class="btn" id="a1run" onclick="A1.run(this)">AI 评估并排序</button>
+      </div>
+      <p class="disc">数据系数：公开 1.0 ／ 内部 0.8 ／ 客户敏感 0.5。客户敏感数据不是不能做，而是要先定好脱敏和权限方案，所以排序往后放。</p>
+    </div>
+    <div class="out" id="a1out"></div>
+    <details class="fs" data-fs="a1"></details>
+  </section>
+
+  <!-- ============ B1 车源查询 ============ -->
+  <section id="b1">
+    <h1>车源智能查询</h1>
+    <p class="sub">销售把客户需求原话贴进来，系统先按预算筛选在售车源，再按需求检索最匹配的几台；AI 只能从这几台里推荐，配置和车况必须引用车源库原文，不能编造。</p>
+    <div class="flow"><span>客户需求</span><em>→</em><span>脱敏</span><em>→</em><span>按预算筛选（本地）</span><em>→</em><span>需求检索 Top 4（本地）</span><em>→</em><span>AI 推荐 + 微信话术</span></div>
+    <div class="card">
+      <label>客户需求（销售记录的原话）</label>
+      <textarea id="b1q" style="min-height:90px"></textarea>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="B1.fill()">填入示例客户</button>
+        <button class="btn ghost sm" onclick="B1.onlySearch()">只检索，不调用 AI</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="b1run" onclick="B1.run(this)">检索并推荐</button>
+      </div>
+    </div>
+    <div class="out" id="b1out"></div>
+    <div class="card">
+      <h3>车源库 <span class="pill p-warn">以下均为虚构示例车源</span></h3>
+      <p class="note">每行一台车，格式：编号｜车型｜年份｜里程（万公里）｜颜色｜售价（万元）｜类型｜车况｜配置亮点｜适合人群｜在库天数｜状态。修改后点保存，只保存在本机浏览器。</p>
+      <textarea id="b1kb" style="min-height:220px;font-size:13px"></textarea>
+      <div class="btns"><button class="btn ghost sm" onclick="B1.save()">保存车源库</button><button class="btn ghost sm" onclick="B1.reset()">恢复默认</button><button class="btn ghost sm" onclick="B1.aging()">查看库龄超 60 天的车</button></div>
+      <div class="out" id="b1age"></div>
+    </div>
+    <details class="fs" data-fs="b1"></details>
+  </section>
+
+  <!-- ============ B2 话术助手 ============ -->
+  <section id="b2">
+    <h1>销售话术助手</h1>
+    <p class="sub">客户在微信里砍价、担心车况、问贷款，销售把原话贴进来，系统检索 3 条标准话术，AI 按门店口径写一条可以直接发的回复，并提醒禁忌。回复只给销售参考，确认后再发。</p>
+    <div class="flow"><span>客户原话</span><em>→</em><span>脱敏</span><em>→</em><span>话术库检索 Top 3（本地）</span><em>→</em><span>AI 写回复</span><em>→</em><span>禁忌提醒</span></div>
+    <div class="card">
+      <label>客户发来的原话</label>
+      <textarea id="b2m" style="min-height:100px"></textarea>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="B2.fill()">填入示例（砍价 + 担心车况）</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="b2run" onclick="B2.run(this)">检索并生成回复</button>
+      </div>
+    </div>
+    <div class="out" id="b2out"></div>
+    <div class="card">
+      <h3>话术库 <span class="pill p-warn">示例</span></h3>
+      <p class="note">每行一条，格式：场景｜客户常见说法｜标准话术｜禁忌</p>
+      <textarea id="b2kb" style="min-height:180px"></textarea>
+      <div class="btns"><button class="btn ghost sm" onclick="B2.save()">保存话术库</button><button class="btn ghost sm" onclick="B2.reset()">恢复默认</button></div>
+    </div>
+    <details class="fs" data-fs="b2"></details>
+  </section>
+
+  <!-- ============ B3 金融方案 ============ -->
+  <section id="b3">
+    <h1>金融方案助手</h1>
+    <p class="sub">月供、利息、总费用全部由本地程序按等额本息计算，不交给 AI 算；AI 只负责把方案解释成客户听得懂的话，并按金融合规要求检查表述。</p>
+    <div class="flow"><span>车价与方案参数</span><em>→</em><span>本地计算月供与总利息（不调用 AI）</span><em>→</em><span>三档方案对比</span><em>→</em><span>AI 写客户说明 + 合规提醒</span></div>
+    <div class="card">
+      <div class="row">
+        <div><label>车价（万元）</label><input id="b3p" type="number" step="0.1"></div>
+        <div><label>首付比例</label><select id="b3d"><option value="0.2">20%</option><option value="0.3">30%</option><option value="0.4">40%</option><option value="0.5">50%</option></select></div>
+        <div><label>期数</label><select id="b3n"><option>12</option><option>24</option><option>36</option><option>48</option><option>60</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>年化利率（%）</label><input id="b3r" type="number" step="0.01"></div>
+        <div><label>一次性服务费（元，没有填 0）</label><input id="b3f" type="number" step="100"></div>
+        <div><label>客户关注点</label><input id="b3c" placeholder="例如：月供不想超过 7000"></div>
+      </div>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="B3.fill()">填入示例</button>
+        <button class="btn ghost sm" onclick="B3.calcOnly()">只计算，不调用 AI</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="b3run" onclick="B3.run(this)">计算并生成客户说明</button>
+      </div>
+      <p class="disc">利率与服务费均为演示用示例值，实际以合作金融机构审批结果为准。</p>
+    </div>
+    <div class="out" id="b3out"></div>
+    <details class="fs" data-fs="b3"></details>
+  </section>
+
+  <!-- ============ B4 制度问答 ============ -->
+  <section id="b4">
+    <h1>制度问答机器人</h1>
+    <p class="sub">员工问提成、报销、请假、优惠审批等问题，先从制度知识库检索最相关的 3 条，AI 只根据这 3 条回答并标注出处；查不到就说不知道，转人事或财务。</p>
+    <div class="flow"><span>员工提问</span><em>→</em><span>制度检索 Top 3（本地）</span><em>→</em><span>AI 只依据检索结果回答</span><em>→</em><span>标注出处</span></div>
+    <div class="card">
+      <label>员工的问题</label>
+      <input id="b4q" placeholder="例如：客户要求优惠 8000，我能直接答应吗？">
+      <div class="btns">
+        <button class="btn ghost sm" onclick="B4.fill()">填入示例问题</button>
+        <button class="btn ghost sm" onclick="B4.onlySearch()">只检索，不调用 AI</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="b4run" onclick="B4.run(this)">检索并回答</button>
+      </div>
+    </div>
+    <div class="out" id="b4out"></div>
+    <div class="card">
+      <h3>制度知识库 <span class="pill p-warn">以下均为虚构示例制度</span></h3>
+      <p class="note">每行一条，格式：标题｜内容。修改后点保存，只保存在本机浏览器。</p>
+      <textarea id="b4kb" style="min-height:200px"></textarea>
+      <div class="btns"><button class="btn ghost sm" onclick="B4.save()">保存知识库</button><button class="btn ghost sm" onclick="B4.reset()">恢复默认</button></div>
+    </div>
+    <details class="fs" data-fs="b4"></details>
+  </section>
+
+  <!-- ============ B5 文案合规 ============ -->
+  <section id="b5">
+    <h1>营销文案合规</h1>
+    <p class="sub">朋友圈、抖音、懂车帝的车源文案发布前过两道关：第一道本地禁用词扫描（不调用 AI、秒出结果）；第二道 AI 按广告和金融宣传规则审核，并给出合规改写版本。</p>
+    <div class="flow"><span>车源文案</span><em>→</em><span>① 本地禁用词扫描</span><em>→</em><span>② AI 规则审核</span><em>→</em><span>风险等级 + 修改建议 + 改写稿</span><em>→</em><span>高风险找店长确认</span></div>
+    <div class="card">
+      <div class="row">
+        <div><label>发布渠道</label><select id="b5ch"><option>朋友圈</option><option>抖音 / 视频号</option><option>懂车帝 / 汽车之家</option></select></div>
+      </div>
+      <label>待发布文案</label>
+      <textarea id="b5t" style="min-height:100px"></textarea>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="B5.fill()">填入一条有问题的示例</button>
+        <button class="btn ghost sm" onclick="B5.scanOnly()">只跑禁用词扫描</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="b5run" onclick="B5.run(this)">完整审核（词库 + AI）</button>
+      </div>
+      <p class="disc">禁用词与审核规则仅为演示，实际以《广告法》等法规和公司法务意见为准。</p>
+    </div>
+    <div class="out" id="b5out"></div>
+    <details class="fs" data-fs="b5"></details>
+  </section>
+
+  <!-- ============ B6 销售日报 ============ -->
+  <section id="b6">
+    <h1>销售日报</h1>
+    <p class="sub">今日与昨日指标填进来（正式版从 DMS 或多维表格自动读取），系统先算涨跌幅，AI 找出最值得关注的异动、推测原因并给出动作，生成可直接发到企业微信群的日报。</p>
+    <div class="flow"><span>指标</span><em>→</em><span>本地计算涨跌幅</span><em>→</em><span>AI 找异动、推测原因</span><em>→</em><span>群消息</span></div>
+    <div class="card">
+      <h3>今日指标 <span class="pill p-warn">示例数据</span></h3>
+      <div class="tw"><table id="b6tbl"><thead><tr><th>指标</th><th style="width:110px">昨日</th><th style="width:110px">今日</th><th>单位</th><th class="num">变化</th></tr></thead><tbody></tbody></table></div>
+      <label>当日事件（选填）</label>
+      <textarea id="b6n" style="min-height:70px"></textarea>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="B6.fill()">恢复示例</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="b6run" onclick="B6.run(this)">生成日报</button>
+      </div>
+    </div>
+    <div class="out" id="b6out"></div>
+    <details class="fs" data-fs="b6"></details>
+  </section>
+
+  <!-- ============ C1 培训题库 ============ -->
+  <section id="c1">
+    <h1>新人培训题库</h1>
+    <p class="sub">把销售 SOP、话术禁忌或制度条款贴进来，自动生成单选题、标准答案和解析；新人可以现场作答，也可以导出表格导入多维表格做考试。</p>
+    <div class="flow"><span>SOP / 话术禁忌</span><em>→</em><span>AI 出题</span><em>→</em><span>现场作答</span><em>→</em><span>导出 CSV</span></div>
+    <div class="card">
+      <label>出题依据</label>
+      <textarea id="c1t" style="min-height:200px"></textarea>
+      <div class="row">
+        <div><label>题目数量</label><select id="c1n"><option>5</option><option>10</option></select></div>
+        <div><label>难度</label><select id="c1d"><option>新人入门</option><option>进阶</option></select></div>
+      </div>
+      <div class="btns">
+        <button class="btn ghost sm" onclick="C1.fill()">填入示例 SOP</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="c1run" onclick="C1.run(this)">生成题目</button>
+      </div>
+    </div>
+    <div class="out" id="c1out"></div>
+    <details class="fs" data-fs="c1"></details>
+  </section>
+
+  <!-- ============ D1 成本与日志 ============ -->
+  <section id="d1">
+    <h1>API 成本与调用日志</h1>
+    <p class="sub">上线前先算账：按每个工具每天的调用次数和每次消耗的 token 估算月成本，再看哪些环节可以不调用 AI。所有调用都留日志，客户信息发给 AI 前先脱敏。</p>
+    <div class="flow"><span>每天调用量</span><em>→</em><span>每次 token</span><em>→</em><span>模型单价</span><em>→</em><span>月成本</span><em>→</em><span>省钱措施</span></div>
+    <div class="card">
+      <h3>月度成本测算 <span class="pill p-warn">单价为示例值，以模型官网为准</span></h3>
+      <div class="row">
+        <div><label>输入单价（元 / 百万 token）</label><input id="d1pin" type="number" step="0.1"></div>
+        <div><label>输出单价（元 / 百万 token）</label><input id="d1pout" type="number" step="0.1"></div>
+        <div><label>每月工作天数</label><input id="d1days" type="number"></div>
+      </div>
+      <div class="tw" style="margin-top:10px"><table id="d1tbl"><thead><tr><th>工具</th><th style="width:100px">每天调用</th><th style="width:110px">每次输入 token</th><th style="width:110px">每次输出 token</th><th class="num">月成本（元）</th></tr></thead><tbody></tbody></table></div>
+      <div id="d1sum" class="out"></div>
+      <div class="btns"><button class="btn ghost sm" onclick="D1.reset()">恢复示例参数</button><span style="flex:1"></span><button class="btn ghost sm" onclick="D1.compare()">对比：如果不做本地检索、整表发给 AI</button></div>
+      <div id="d1cmp" class="out"></div>
+    </div>
+    <div class="card">
+      <h3>本演示里的省钱设计</h3>
+      <ul class="tight">
+        <li><b>能本地做的不调用 AI：</b>车源筛选、话术和制度检索、月供计算、禁用词扫描、涨跌幅计算，全部在本机完成，0 成本、0 幻觉。</li>
+        <li><b>只发相关的几条：</b>车源库可能有几百台车，每次只把检索到的 4 台发给 AI，输入 token 降一个数量级。</li>
+        <li><b>查不到就不调用：</b>知识库没有匹配内容时直接转人工，不花钱让 AI 猜。</li>
+        <li><b>按任务选模型：</b>问答、日报这类日常任务用价格低的模型；只有复杂分析才用贵的模型。</li>
+        <li><b>高频问题缓存：</b>正式版对每天重复出现的制度问题缓存答案，命中缓存不再调用。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>脱敏试验台</h3>
+      <div class="row">
+        <div><label>原文</label><textarea id="d1in" style="min-height:120px"></textarea></div>
+        <div><label>AI 实际看到的版本</label><div id="d1view" class="seen" style="display:block;min-height:120px;margin:0"></div></div>
+      </div>
+      <div class="btns"><button class="btn ghost sm" onclick="D1.fillMask()">填入示例</button><span style="flex:1"></span><button class="btn" onclick="D1.runMask()">脱敏预览</button></div>
+      <div id="d1map" class="out"></div>
+      <label>客户姓名词典（每行一个；正式版对接 CRM 自动识别）</label>
+      <textarea id="d1names" style="min-height:70px"></textarea>
+      <div class="btns"><button class="btn ghost sm" onclick="D1.saveNames()">保存词典</button></div>
+    </div>
+    <div class="card">
+      <h3>AI 调用日志</h3>
+      <div id="d1log"></div>
+      <div class="btns"><button class="btn ghost sm" onclick="D1.exportLog()">导出 CSV</button><button class="btn ghost sm" onclick="D1.clearLog(this)">清空日志</button></div>
+    </div>
+    <details class="fs" data-fs="d1"></details>
+  </section>
+
+  <!-- ============ E1 效果看板 ============ -->
+  <section id="e1">
+    <h1>效果看板</h1>
+    <p class="sub">每个工具的调用次数和“有用 / 没用”反馈汇总到这里，按“有用次数 × 人工基准耗时”估算节省工时，用来决定下一轮优化哪个工具。</p>
+    <div class="kpis" id="e1kpi"></div>
+    <div class="card">
+      <h3>分工具统计</h3>
+      <div class="tw" id="e1tbl"></div>
+      <p class="disc">节省工时 = 被标“有用”的次数 × 人工基准耗时。基准耗时是上线前实测的人工处理一次所需时间，正式版由各部门实测后填写。</p>
+    </div>
+    <div class="card">
+      <h3>最近的“没用”反馈（下一轮优化的素材）</h3>
+      <div id="e1bad"></div>
+    </div>
+    <div class="btns"><button class="btn ghost sm" id="e1sim" onclick="E1.sim()">填入模拟 30 天数据</button><button class="btn ghost sm" onclick="E1.clear(this)">清空统计</button></div>
+    <details class="fs" data-fs="e1"></details>
+  </section>
+
+  <!-- ============ 设置 ============ -->
+  <section id="set">
+    <h1>设置与模型选型</h1>
+    <p class="sub">Key 只保存在本机浏览器，不写进文件，文件可以放心发给别人。快速演示模式下不填 Key 也能看完所有示例。</p>
+    <div class="mask-note" id="hostNote" hidden>你正在看线上演示版：所有示例都可以在快速演示模式下完整运行。线上版不能直接连接模型接口，实时调用 AI 会在面试现场用本地版演示。</div>
+    <div class="card">
+      <div class="row">
+        <div><label>模型服务商</label><select id="sProv"><option value="deepseek">DeepSeek</option><option value="kimi">Kimi（月之暗面）</option><option value="zhipu">智谱 GLM</option><option value="custom">自定义（兼容 OpenAI 格式）</option></select></div>
+        <div><label>模型名称</label><input id="sModel"></div>
+      </div>
+      <label>接口地址</label><input id="sBase">
+      <label>API Key</label><input id="sKey" type="password" placeholder="sk-…">
+      <div class="btns"><button class="btn" onclick="Setting.save()">保存</button><button class="btn ghost" id="sTest" onclick="Setting.test(this)">测试连接</button><button class="btn ghost" onclick="Setting.clearKey()">清除 Key</button></div>
+      <div class="out" id="sOut"></div>
+    </div>
+    <div class="card">
+      <h3>选型思路</h3>
+      <div class="tw"><table>
+        <thead><tr><th>场景</th><th>选型原则</th><th>本演示的做法</th></tr></thead>
+        <tbody>
+          <tr><td>车源、话术、制度问答</td><td>中文效果好、价格低；靠知识库保证准确</td><td>默认 DeepSeek，先检索再回答，可一键切换 Kimi、智谱对比</td></tr>
+          <tr><td>月供、提成等数字</td><td>数字不能错，不交给大模型算</td><td>本地程序计算，AI 只解释</td></tr>
+          <tr><td>客户身份证、手机号、银行卡</td><td>客户信息不出公司</td><td>发给 AI 前统一脱敏；正式版可考虑内网部署模型</td></tr>
+          <tr><td>搭建平台</td><td>先快后稳：一两天出 MVP，好用再固化</td><td>Coze 适合对外的销售助手（可发布到企业微信），Dify 适合内部知识库（可私有部署）</td></tr>
+        </tbody>
+      </table></div>
+      <p class="disc">选型流程：同一批真实样本（脱敏后）在 2-3 个模型上跑，按准确率、耗时、成本打分，小范围试点后再定。</p>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+/* ================= 示例数据（全部虚构） ================= */
+const B1_DEFAULT = `TZ-001｜奔驰 GLC 300L 4MATIC 豪华型｜2022｜2.6｜曜岩黑｜29.8｜SUV｜一手车，4S 店保养记录齐全，第三方检测无事故、无泡水、无火烧｜全景天窗、柏林之声音响、360 影像、电动尾门｜家庭用车，空间大，后排宽敞，适合有小孩的家庭｜18｜在售
+TZ-002｜宝马 X3 xDrive30i 领先型 M 曜夜套装｜2021｜4.1｜矿石白｜24.5｜SUV｜一手车，第三方检测无事故；左后门有补漆｜四驱、M 运动套装、抬头显示｜喜欢操控和运动风格的年轻车主｜75｜在售
+TZ-003｜奥迪 A6L 45 TFSI 臻选动感型｜2022｜3.0｜星河灰｜26.8｜轿车｜一手车，第三方检测无事故｜矩阵大灯、四区空调、B&O 音响｜商务接待、日常通勤｜33｜在售
+TZ-004｜保时捷 Macan 2.0T｜2020｜5.2｜白色｜39.8｜SUV｜右前翼子板轻微刮擦已修复，检测报告附说明｜运动排气、空气悬架、BOSE 音响｜追求品牌和驾驶乐趣｜52｜在售
+TZ-005｜雷克萨斯 ES 300h 卓越版｜2021｜3.6｜银色｜23.9｜轿车｜一手车，第三方检测无事故，混动电池检测正常｜混合动力、油耗低、Mark Levinson 音响｜通勤多、看重省油和可靠性｜21｜在售
+TZ-006｜奔驰 E300L 时尚型｜2021｜4.5｜黑色｜25.6｜轿车｜一手车，第三方检测无事故｜柏林之声音响、氛围灯、后排加长｜商务接待、家用兼顾｜92｜在售
+TZ-007｜宝马 530Li 领先型 M 运动套装｜2022｜2.2｜波尔蒂芒蓝｜30.5｜轿车｜一手车，第三方检测无事故｜M 运动套装、哈曼卡顿音响、驾驶辅助｜商务和运动兼顾｜27｜在售
+TZ-008｜路虎 揽胜极光 L P250｜2021｜3.9｜碳晶绿｜26.3｜SUV｜一手车，第三方检测无事故；前保险杠有划痕已修复｜四驱、全地形反馈、全景天窗｜喜欢越野风格和颜值，偶尔自驾出游｜64｜在售
+TZ-009｜沃尔沃 XC60 B5 四驱智远豪华版｜2022｜2.8｜银河灰｜27.5｜SUV｜一手车，4S 店保养记录齐全，第三方检测无事故｜城市安全系统、自动紧急制动、宝华韦健音响、空气净化｜家庭用车，看重安全，有小孩，常跑高速｜12｜在售
+TZ-010｜理想 L7 Pro｜2023｜1.9｜珍珠白｜22.6｜SUV｜一手车，电池检测健康度 97%｜增程、五座大空间、后排娱乐屏、冰箱｜家庭用车，市区通勤用电、长途用油｜15｜在售
+TZ-011｜特斯拉 Model Y 长续航｜2022｜3.3｜深海蓝｜21.8｜SUV｜一手车，电池检测健康度 94%｜纯电、辅助驾驶、超充｜市区通勤为主，家里能装充电桩｜48｜在售
+TZ-012｜奔驰 S400L 商务型｜2020｜6.1｜黑色｜52.0｜轿车｜一手车，第三方检测无事故｜后排按摩、行政座椅、柏林之声音响｜企业主商务接待｜40｜已预订`;
+
+const B2_DEFAULT = `嫌贵砍价｜别家同款便宜两万 / 能不能再少点｜先认同客户比价是合理的，再说明价差来源：车况等级、保养记录、过户手续、质保和整备；可以帮客户申请店长特批，或改为赠送保养、贴膜等权益。｜不得贬低同行；不得口头承诺未经审批的优惠金额
+担心车况｜怕是事故车泡水车 / 二手车靠不靠谱｜出示第三方检测报告和 4S 店保养记录，邀请客户到店看车，或带车到客户指定的检测机构复检；说明门店的车况承诺条款。｜不得说“绝对没问题”；不得隐瞒检测报告上的瑕疵
+贷款咨询｜贷款能批多少 / 利息多少 / 能不能零首付｜说明首付比例和期数都可以选，最终以金融机构审批为准；用金融方案助手算出月供和总利息发给客户。｜不得承诺“包过”“零首付无条件”；不得隐瞒服务费等费用
+再考虑考虑｜我再看看 / 回去和家里商量｜尊重客户节奏，主动发车辆视频和检测报告，约一个方便的时间带家人来试驾，记下客户顾虑。｜不得制造虚假紧迫感，例如“今天不定明天就没了”
+旧车置换｜我的旧车能抵多少钱｜引导评估师到店或上门评估，说明评估看车况、年份、里程和市场行情；评估价和新车优惠分开报。｜不得为了成交先报虚高估价
+新能源顾虑｜电池会不会衰减 / 续航虚不虚｜出示电池检测报告和健康度数据，说明厂家电池质保政策，建议客户按自己的通勤距离评估。｜不得夸大续航；不得承诺电池永不衰减
+交车时间｜什么时候能提车｜说明过户、上牌、整备所需的大致时间，以实际办理进度为准，每个节点主动同步客户。｜不得承诺做不到的提车日期`;
+
+const B4_DEFAULT = `销售提成｜每台车提成 = 该车毛利 × 8%；当月交车满 5 台的部分按 10% 计。提成按交车（非订车）结算，次月 15 日随工资发放；客户退订的车辆不计提成。
+金融奖励｜客户办理合作机构贷款并放款成功，每单额外奖励 500 元；当月金融渗透率达到 50% 以上，金融奖励整体上浮 20%。
+优惠审批｜销售可直接给予的优惠不超过 3000 元；3000-10000 元需店长审批；超过 10000 元需总经理审批。审批在企业微信「审批 → 价格特批」提交，未审批的优惠不得口头承诺客户。
+试驾车管理｜试驾前须登记客户驾驶证并拍照存档，试驾路线按门店规定执行，单次不超过 30 分钟；试驾车钥匙下班前交还前台。
+费用报销｜在企业微信「审批 → 报销」提交并附电子发票；单笔 2000 元以上需财务负责人审批；每月 25 日后提交的单据次月处理。
+请假｜年假需提前 3 天在企业微信「审批 → 假勤」提交；周末和节假日为销售旺季，原则上不批年假，特殊情况需店长同意。
+客户信息保密｜客户身份证、银行卡、联系方式只能存在公司 CRM 中，不得截图转发到个人微信或上传到外部 AI 工具；离职须交接全部客户资料。
+交车流程｜交车前完成整备、清洗、检测报告打印；交车时与客户逐项核对车况、配置、随车物品，签署交车确认单后方可交付钥匙。`;
+
+const BANNED = [
+  ['最低价','高','绝对化用语（广告法）'],['全成都最','高','绝对化用语（广告法）'],['第一','中','绝对化用语，需有依据'],['顶级','中','绝对化用语（广告法）'],
+  ['0首付','高','零首付宣传，需写明条件或删除'],['零首付','高','零首付宣传，需写明条件或删除'],['0利息','高','零利息宣传，需写明条件与费用'],['零利息','高','零利息宣传，需写明条件与费用'],
+  ['包过','高','承诺贷款必批'],['无条件','高','与事实不符的承诺'],['绝对无事故','高','车况绝对化承诺，应以检测报告为准'],['准新车','中','需注明年份和里程，避免误导'],
+  ['原价','中','原价需真实可查，否则属虚构原价'],['仅剩','中','制造紧迫感，需真实'],['最后1台','中','制造紧迫感，需真实'],['明天就没了','中','制造紧迫感']
+];
+
+const SAMPLE = {
+  a1:[
+    {dept:'销售', task:'客户问车时翻 Excel 库存表找车、查配置和车况', min:6, freq:150, data:'内部'},
+    {dept:'销售', task:'回复客户砍价、车况、贷款等问题，新人不知道怎么说', min:8, freq:90, data:'客户敏感'},
+    {dept:'车源', task:'新车源到店后写车况描述和朋友圈 / 懂车帝文案', min:25, freq:20, data:'公开'},
+    {dept:'金融', task:'给客户算不同首付和期数的月供，解释金融方案', min:12, freq:45, data:'客户敏感'},
+    {dept:'人事', task:'新人反复问提成、报销、请假、优惠审批规定', min:5, freq:50, data:'内部'},
+    {dept:'财务', task:'每天汇总进店、订单、交车数据写销售日报', min:40, freq:6, data:'内部'},
+    {dept:'市场', task:'车源文案发布前人工检查有没有违规用语', min:10, freq:25, data:'公开'}
+  ],
+  b1q:'客户张伟，电话 13812345678。预算 25 到 30 万，家里两个小孩，平时市区通勤，周末经常跑高速去都江堰、青城山。想要 SUV，最看重安全和后排空间，不要白色。',
+  b2m:'你们那台沃尔沃 XC60 我看了，别家同款便宜两万多。而且二手车我总担心是不是事故车，你们能保证吗？能便宜点我这周就定。',
+  b3:{p:27.5, d:'0.3', n:'36', r:'4.5', f:'0', c:'月供不想超过 7000，想知道总共多花多少利息'},
+  b4q:'客户要求优惠 8000 元，我能直接答应吗？成交后提成怎么算？',
+  b5t:'【名车特惠】全成都最低价！2022 款沃尔沃 XC60 准新车，0首付0利息，无条件包过，绝对无事故！原价 45 万现仅需 27.5 万，仅剩最后1台，今天不来明天就没了！',
+  b6:[['进店客流','42','68','组'],['新增线索（抖音 / 懂车帝）','35','61','条'],['试驾','15','22','次'],['订单','5','4','台'],['交车','3','6','台'],['金融渗透率','40','25','%'],['库龄超 60 天车辆','4','5','台']],
+  b6n:'周六店内举办“家庭 SUV 品鉴日”活动；懂车帝投放预算加倍；一位 S400L 意向客户因贷款审批未通过退订。',
+  c1t:`销售接待与成交 SOP（示例）
+1. 客户进店 30 秒内主动接待，先了解用车需求和预算，再推荐车辆，不得一上来就推库存车。
+2. 介绍车况必须以第三方检测报告和保养记录为准，报告上有的瑕疵要主动告知客户。
+3. 销售可直接给予的优惠不超过 3000 元，超过须走价格特批，未审批前不得口头承诺。
+4. 贷款咨询只能说明“以金融机构审批为准”，不得承诺包过、零首付无条件。
+5. 试驾前必须登记客户驾驶证并拍照存档。
+6. 客户身份证、银行卡信息只能录入 CRM，不得截图发个人微信或上传外部 AI 工具。
+7. 不得贬低同行，不得制造“今天不买明天就没了”这类虚假紧迫感。`,
+  mask:'客户张伟（身份证 510104199001011234），电话 13812345678，银行卡 6222 0212 3456 7890 123，邮箱 zhangwei@example.com。意向沃尔沃 XC60，申请 36 期贷款。'
+};
+
+/* ================= 基础工具 ================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S = {
+  get(k, d){ try{ const v = localStorage.getItem('car_' + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('car_' + k, JSON.stringify(v)); }catch(e){} }
+};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clone = o => JSON.parse(JSON.stringify(o));
+const loading = (el, msg) => { el.innerHTML = `<div class="card loading"><div class="spin"></div>${esc(msg)}</div>`; };
+const showErr = (el, e) => { el.innerHTML = `<div class="err">${esc(e.message || e)}</div>`; };
+async function busy(btn, fn){
+  const old = btn.textContent; btn.disabled = true; btn.textContent = '处理中…';
+  try{ await fn(); } finally { btn.disabled = false; btn.textContent = old; }
+}
+function md(s){
+  const lines = esc(s).split('\n'); let html = '', inList = false;
+  for(const raw of lines){
+    let l = raw.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    if(/^\s*[-•]\s+/.test(l)){ if(!inList){ html += '<ul class="tight">'; inList = true; } html += '<li>' + l.replace(/^\s*[-•]\s+/, '') + '</li>'; continue; }
+    if(inList){ html += '</ul>'; inList = false; }
+    if(/^#{1,4}\s/.test(l)) html += '<p><b>' + l.replace(/^#{1,4}\s/, '') + '</b></p>';
+    else if(l.trim()) html += '<p style="margin:6px 0">' + l + '</p>';
+  }
+  if(inList) html += '</ul>';
+  return html;
+}
+const IS_HOSTED = (() => { try{ return window.self !== window.top; }catch(e){ return true; } })();  // 只在嵌入式查看器（如 Claude 线上页）里为真；本地打开和 GitHub Pages 都是 false
+function toast(msg){
+  let t = document.getElementById('toast');
+  if(!t){ t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2400);
+}
+function confirmClick(btn, label, fn){
+  if(btn.dataset.armed){ delete btn.dataset.armed; btn.textContent = btn.dataset.old; fn(); return; }
+  btn.dataset.old = btn.textContent; btn.dataset.armed = '1'; btn.textContent = label;
+  setTimeout(() => { if(btn.dataset.armed){ delete btn.dataset.armed; btn.textContent = btn.dataset.old; } }, 3000);
+}
+function writeClip(text){ return navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard')); }
+function download(name, text){
+  if(IS_HOSTED){ writeClip(text).then(() => toast('线上版不能下载文件，CSV 内容已复制，可直接粘贴到 Excel 或在线表格'), () => toast('线上版不能下载文件，请使用本地版导出')); return; }
+  const blob = new Blob(['﻿' + text], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const csvCell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+const yuan = v => Number(v).toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2});
+function copyText(t, btn){ writeClip(t).then(() => { btn.textContent = '已复制'; }, () => { btn.textContent = '复制失败，请手动选中文字复制'; }); }
+
+const TOOLS = {
+  a1:{name:'AI 机会评估表', dept:'各部门', base:60},
+  b1:{name:'车源智能查询', dept:'销售 · 车源', base:6},
+  b2:{name:'销售话术助手', dept:'销售', base:8},
+  b3:{name:'金融方案助手', dept:'金融', base:12},
+  b4:{name:'制度问答机器人', dept:'人事 · 财务', base:5},
+  b5:{name:'营销文案合规', dept:'市场', base:10},
+  b6:{name:'销售日报', dept:'管理层 · 财务', base:40},
+  c1:{name:'新人培训题库', dept:'培训', base:60}
+};
+
+/* ================= 开关 ================= */
+const State = { quick: S.get('quick', true), mask: S.get('mask', true) };
+$('swQuick').checked = State.quick; $('swMask').checked = State.mask;
+if(IS_HOSTED){ const n = document.getElementById('hostNote'); if(n) n.hidden = false; }
+function quickHint(){ $('quickHint').textContent = State.quick ? '（示例秒出结果）' : '（实时调用 AI）'; }
+quickHint();
+$('swQuick').onchange = e => { State.quick = e.target.checked; S.set('quick', State.quick); quickHint(); };
+$('swMask').onchange = e => { State.mask = e.target.checked; S.set('mask', State.mask); };
+
+/* ================= 脱敏 ================= */
+const DEFAULT_NAMES = ['张伟','李娜','王芳','刘洋','陈静'];
+function names(){ return S.get('names', DEFAULT_NAMES); }
+function mask(text){
+  const rev = {}, map = {}, cnt = {}, items = [];
+  const tokenFor = (type, val) => {
+    const key = type + '|' + val;
+    if(rev[key]) return rev[key];
+    cnt[type] = (cnt[type] || 0) + 1;
+    const t = `[${type}${cnt[type]}]`; rev[key] = t; map[t] = val; items.push({type, val, t}); return t;
+  };
+  let out = String(text || '');
+  const rules = [
+    ['邮箱', /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g],
+    ['身份证', /\b\d{17}[\dXx]\b/g],
+    ['银行卡', /\b\d{4}[ -]\d{4}[ -]\d{4}[ -]\d{4}(?:[ -]?\d{1,3})?\b|\b\d{16,19}\b/g],
+    ['手机号', /\b1[3-9]\d{9}\b/g]
+  ];
+  for(const [type, re] of rules) out = out.replace(re, m => tokenFor(type, m));
+  for(const n of names()){
+    if(!n.trim()) continue;
+    const re = new RegExp(n.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    out = out.replace(re, m => tokenFor('姓名', m));
+  }
+  return {text: out, map, count: items.length, items};
+}
+function restore(s, map){
+  if(typeof s !== 'string') return s;
+  for(const [t, v] of Object.entries(map || {})) s = s.split(t).join(v);
+  return s;
+}
+function restoreDeep(o, map){
+  if(Array.isArray(o)) return o.map(x => restoreDeep(x, map));
+  if(o && typeof o === 'object'){ const r = {}; for(const k in o) r[k] = restoreDeep(o[k], map); return r; }
+  return restore(o, map);
+}
+function tokHtml(s){ return esc(s).replace(/\[(姓名|手机号|身份证|银行卡|邮箱)\d+\]/g, m => `<span class="tok">${m}</span>`); }
+function maskNote(r){
+  if(!r.count) return State.mask ? `<div class="mask-note">发送前脱敏已开启，本次内容未发现需要替换的客户信息。</div>` : `<div class="mask-note" style="background:var(--warnbg);color:var(--warn)">发送前脱敏已关闭，原文会直接发给 AI。</div>`;
+  const id = 'seen' + Math.random().toString(36).slice(2, 7);
+  return `<div class="mask-note">已脱敏 ${r.count} 处（${[...new Set(r.items.map(i => i.type))].join('、')}），AI 只看到代号，结果已在本机还原。<button onclick="var e=document.getElementById('${id}');e.style.display=e.style.display==='block'?'none':'block'">看看 AI 收到了什么</button></div><div class="seen" id="${id}">${tokHtml(r.sent)}</div>`;
+}
+
+/* ================= 日志与反馈 ================= */
+function addLog(o){ const l = S.get('log', []); l.push(Object.assign({ts: Date.now()}, o)); S.set('log', l.slice(-800)); }
+function fb(tool){
+  const id = 'fb' + Math.random().toString(36).slice(2, 8);
+  return `<div class="fb" id="${id}">这次结果对你有用吗？
+    <button onclick="vote('${tool}','up','${id}',this)">有用</button>
+    <button onclick="vote('${tool}','down','${id}',this)">没用</button></div>`;
+}
+function vote(tool, v, id, btn){
+  const box = $(id); box.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+  const l = S.get('fb', []);
+  const rec = {ts: Date.now(), tool, v, note:''}; l.push(rec); S.set('fb', l.slice(-800));
+  if(v === 'down' && !box.querySelector('input')){
+    box.insertAdjacentHTML('beforeend', `<input placeholder="哪里不好？一句话就行"><button>提交</button>`);
+    const inp = box.querySelector('input'), sub = box.querySelectorAll('button')[2];
+    sub.onclick = () => { const all = S.get('fb', []); const r = all.find(x => x.ts === rec.ts); if(r) r.note = inp.value.trim(); S.set('fb', all); sub.textContent = '已记录'; sub.disabled = true; };
+  }
+}
+
+/* ================= 调用 AI ================= */
+const PROVIDERS = {
+  deepseek:{base:'https://api.deepseek.com', model:'deepseek-chat'},
+  kimi:{base:'https://api.moonshot.cn/v1', model:'moonshot-v1-8k'},
+  zhipu:{base:'https://open.bigmodel.cn/api/paas/v4', model:'glm-4-flash'},
+  custom:{base:'', model:''}
+};
+async function llm(system, user, opt = {}){
+  const key = S.get('key', '');
+  if(!key) throw new Error('还没有配置 API Key。请到左侧「设置与模型选型」填写，或打开顶部「快速演示模式」并点「填入示例」查看预置结果。');
+  const base = (S.get('base', PROVIDERS.deepseek.base) || '').replace(/\/+$/, '');
+  const body = {model: S.get('model', PROVIDERS.deepseek.model), messages:[{role:'system', content:system}, {role:'user', content:user}], temperature: opt.temperature ?? 0.4};
+  if(opt.json !== false && /deepseek|moonshot/.test(base)) body.response_format = {type:'json_object'};
+  let res;
+  try{
+    res = await fetch(base + '/chat/completions', {method:'POST', headers:{'Content-Type':'application/json', 'Authorization':'Bearer ' + key}, body: JSON.stringify(body)});
+  }catch(e){ if(IS_HOSTED) throw new Error('线上演示版不能直接连接模型接口。请打开顶部「快速演示模式」并点「填入示例」查看效果；实时调用请用本地版现场演示。'); throw new Error('连不上模型接口（网络被拦或浏览器限制）。可以换 Chrome / Edge 打开，或检查接口地址。\n原始错误：' + e.message); }
+  if(!res.ok){
+    const t = await res.text();
+    const hint = res.status === 401 ? 'Key 不正确。' : res.status === 402 ? '账户余额不足。' : res.status === 429 ? '请求太频繁，稍等再试。' : '';
+    throw new Error(`接口返回错误 ${res.status}。${hint}\n${t.slice(0, 300)}`);
+  }
+  const data = await res.json();
+  const txt = data.choices?.[0]?.message?.content ?? '';
+  const usage = data.usage || {};
+  if(opt.json === false) return txt;
+  let parsed;
+  try{ parsed = JSON.parse(txt); }
+  catch(e){ const m = txt.match(/\{[\s\S]*\}/); if(m) parsed = JSON.parse(m[0]); else throw new Error('AI 返回的格式不对，请再点一次。'); }
+  Object.defineProperty(parsed, '__usage', {value: usage, enumerable: false});
+  return parsed;
+}
+/* 每个工具统一走这里：脱敏 → 快速模式取预置结果 / 实时调用 → 还原 → 记日志 */
+async function ai(tool, system, user, isSample){
+  const m = State.mask ? mask(user) : {text:user, map:{}, count:0, items:[]};
+  const useCache = State.quick && isSample;
+  if(State.quick && !isSample && !S.get('key', '')) throw new Error('快速演示模式只给示例数据预置了结果。你修改了输入内容，需要实时调用 AI：请到「设置」填写 Key；或点「填入示例」恢复示例数据。');
+  let data, tin, tout;
+  if(useCache){ await sleep(650); data = clone(CACHE[tool]); tin = Math.round((system.length + m.text.length) * 0.7); tout = Math.round(JSON.stringify(data).length * 0.7); }
+  else { data = await llm(system, m.text); const u = data.__usage || {}; tin = u.prompt_tokens || Math.round((system.length + m.text.length) * 0.7); tout = u.completion_tokens || Math.round(JSON.stringify(data).length * 0.7); }
+  addLog({tool, mode: useCache ? '快速演示' : '实时调用', masked: m.count, types:[...new Set(m.items.map(i => i.type))].join('、'), maskOn: State.mask, tin, tout});
+  return {data: restoreDeep(data, m.map), count: m.count, items: m.items, sent: m.text, tin, tout};
+}
+function tokNote(r){ return `<p class="disc">本次约消耗输入 ${r.tin} / 输出 ${r.tout} token${State.quick ? '（快速演示为估算值）' : ''}。</p>`; }
+
+/* ================= 检索（按字词重合打分，不调用 AI） ================= */
+function grams(s){ s = String(s).toLowerCase().replace(/\s+/g, ' '); const g = new Set(); for(let i = 0; i < s.length - 1; i++){ const t = s.slice(i, i + 2); if(!/[\s，。、？！,.?!：:]/.test(t)) g.add(t); } return g; }
+function rank(query, docs, textOf, k = 3){
+  const q = grams(query);
+  return docs.map(d => { const g = grams(textOf(d)); let n = 0; q.forEach(x => { if(g.has(x)) n++; }); return {d, score: n}; })
+    .filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, k);
+}
+
+/* ================= 正式版搭建说明（Coze / Dify） ================= */
+const BUILD = {
+  a1:['用腾讯文档智能表或飞书多维表格建「AI 机会池」：部门、工作内容、单次耗时、每周次数、数据等级。','把表单链接发给销售、车源、金融、人事、财务负责人，一周内收齐。','在 Coze 搭一个评估工作流：读取表格 → 大模型评可行性和方案 → 代码节点按公式算优先级分 → 写回表格。','按优先级分分成“先做 / 第二批 / 暂缓”，和总经理一起确认第一阶段做哪 2-3 个。'],
+  b1:['车源部维护一张车源表（编号、车型、年份、里程、价格、车况、配置、状态），每天更新，导出 CSV。','Coze：把车源表导入「数据库」，工作流第一步用代码节点解析客户预算，SQL 筛出在售、预算内的车；Dify 也可以把每台车作为一段导入知识库。','第二步用知识库检索按“用途、人群、配置”找 Top 4，只把这 4 台交给大模型。','提示词写死：只能推荐检索结果里的车，配置和车况必须引用原文，客户排除的条件要遵守。','发布到企业微信，销售在群里或单聊里直接 @ 机器人使用。'],
+  b2:['把门店话术整理成知识库：场景、客户常见说法、标准话术、禁忌，一条一段。','Coze 建「销售话术助手」智能体，知识库检索 Top 3 后再生成回复。','提示词要求：不超出标准话术的承诺范围，优惠金额、提车日期一律不承诺。','回复只给销售参考，销售确认后自己发给客户。','每周把“没用”的反馈和新出现的客户问题补进话术库。'],
+  b3:['Coze 工作流：开始节点输入车价、首付比例、期数、利率、服务费。','代码节点（Python）按等额本息算月供、总利息、总费用，并生成 24 / 36 / 48 期对比。','大模型节点只拿到算好的数字，负责写客户说明和合规提醒，不让它自己算。','各金融机构的利率和政策放在一张表里，金融专员每月更新。'],
+  b4:['把员工手册、提成制度、报销和审批流程整理成 Word / PDF，导入 Dify 知识库，按“人事 / 财务 / 销售管理”分库。','检索设置 Top 3，并设置相似度阈值；低于阈值直接回复“没有找到相关规定，请联系人事 / 财务”。','提示词要求只根据检索内容回答，并标注出处。','发布到企业微信，新人入职当天拉进使用群。','每周导出没答上的问题，由人事补充制度说明。'],
+  b5:['禁用词表放在一张在线表格里，由市场和法务共同维护。','Coze 工作流：代码节点先做禁用词匹配（不花 token），再交给大模型按规则审核和改写。','高风险文案自动推送给店长确认，确认后才能发布。','审核记录保存在表格里，方便抽查。'],
+  b6:['每天 20:00 由 DMS 导出或销售主管在表格填报当日指标。','Coze 定时触发工作流：代码节点算涨跌幅 → 大模型找异动、写日报。','通过企业微信群机器人 Webhook 推送到管理群。','日报同时存档，月底汇总做复盘。'],
+  c1:['销售 SOP、话术禁忌、制度条款统一放在知识库。','Dify 工作流按 SOP 出题，输出题目、答案、解析。','导出 CSV 导入问卷工具或表格，新人入职第一周完成考核。','错题多的条款反馈给培训负责人，加入下一期培训。'],
+  d1:['在 Coze / Dify 后台按应用查看 token 消耗，每月导出一次。','给每个应用设置月度预算和用量告警。','工作流里能用代码节点做的（筛选、计算、匹配）不用大模型节点。','日常问答用价格低的模型，复杂分析单独选模型。','客户身份证、银行卡等信息在进入工作流前先脱敏。'],
+  e1:['每个机器人回复下方加“有用 / 没用”按钮，点击结果写入一张表格。','用表格仪表盘做调用量、采纳率、节省工时图表。','每月向管理层汇报一次，“没用”最多的工具优先优化。']
+};
+document.querySelectorAll('details.fs').forEach(d => {
+  const k = d.dataset.fs;
+  d.innerHTML = `<summary>正式版在 Coze / Dify 里怎么搭</summary><ol>${(BUILD[k] || []).map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
+});
+
+/* ================= 预置结果（快速演示模式用） ================= */
+const CACHE = {
+  a1:{rows:[
+    {i:1, feasibility:5, plan:'车源表导入知识库，销售输入客户需求，自动筛选预算内在售车并推荐 2-3 台，附车况原文。', tool:'Coze 数据库 + 知识库 + 企业微信机器人', risk:'车源表必须每天更新，否则会推荐已售车辆。'},
+    {i:2, feasibility:4, plan:'话术整理成知识库，销售贴客户原话，检索标准话术后生成回复和禁忌提醒。', tool:'Coze 智能体 + 话术知识库', risk:'客户手机号、姓名需先脱敏；回复由销售确认后再发。'},
+    {i:3, feasibility:5, plan:'按车源表字段自动生成车况描述和多平台文案，再过合规审核。', tool:'Coze 工作流 + 禁用词表', risk:'车况描述只能来自检测报告，不能让 AI 自由发挥。'},
+    {i:4, feasibility:4, plan:'月供由代码节点计算，AI 只写客户说明，并检查是否有“包过”等违规表述。', tool:'Coze 工作流（代码节点 + 大模型）', risk:'利率政策需金融专员每月更新；涉及客户收入信息需脱敏。'},
+    {i:5, feasibility:5, plan:'员工手册和提成制度导入知识库，新人在企业微信直接问。', tool:'Dify 知识库 + 企业微信', risk:'制度更新后要同步知识库，否则会答旧规定。'},
+    {i:6, feasibility:5, plan:'每天定时读取指标，自动算涨跌并生成日报推送到管理群。', tool:'定时工作流 + 群机器人', risk:'AI 推测的原因需主管确认后再对外引用。'},
+    {i:7, feasibility:5, plan:'本地禁用词扫描 + AI 规则审核，高风险推给店长确认。', tool:'Coze 工作流 + 在线表格', risk:'AI 只做初筛，不替代法务判断。'}
+  ], summary:'建议第一阶段先做「车源智能查询」和「制度问答机器人」：前者每周耗时最大、销售天天用，后者不碰客户敏感数据、两三天就能上线。话术助手和金融助手涉及客户信息，先定好脱敏规则，作为第二批。'},
+  b1:{picks:[
+    {id:'TZ-009', why:'预算内（27.5 万），车源库标注“看重安全，有小孩，常跑高速”，配有城市安全系统和自动紧急制动，四驱适合周末跑青城山山路；颜色是银河灰，符合“不要白色”。', watch:'2.8 万公里、在库 12 天，热度高，建议尽快约试驾。'},
+    {id:'TZ-001', why:'预算内（29.8 万），后排宽敞，车源库标注“适合有小孩的家庭”；有 360 影像和电动尾门，日常接送孩子方便；曜岩黑符合颜色要求。', watch:'价格接近预算上限，客户可能会议价。'}
+  ], excluded:[
+    {id:'TZ-010', reason:'珍珠白，客户明确不要白色；如果客户愿意接受白色，它是空间最大、价格最低的选项。'},
+    {id:'TZ-002', reason:'矿石白，不符合颜色要求；而且车源库定位偏运动操控，和“安全、后排空间”的需求不太匹配。'}
+  ], wechat:'[姓名1]您好！按您说的预算 25-30 万、家用 SUV、看重安全和后排空间，我们店里有两台很合适：\n1. 沃尔沃 XC60 B5 四驱智远豪华版，2022 年，2.8 万公里，银河灰，27.5 万。城市安全系统、自动紧急制动都有，四驱跑青城山也稳。\n2. 奔驰 GLC 300L 豪华型，2022 年，2.6 万公里，曜岩黑，29.8 万。后排宽敞，带 360 影像和电动尾门，接送孩子很方便。\n两台都是一手车，第三方检测无事故，检测报告我可以先发给您。您这周末方便带家人来试驾吗？', ask:['孩子多大？是否需要安装儿童安全座椅（ISOFIX）？','是否考虑新能源？家里或单位能不能装充电桩？','有没有旧车需要置换？']},
+  b2:{reply:'理解您的顾虑，比价是应该的。这台 XC60 是一手车，有 4S 店完整保养记录和第三方检测报告（无事故、无泡水、无火烧），我现在就把报告发您，您也可以带到自己信任的检测机构复检。价格方面，同款车差价通常来自车况、手续和质保，我先帮您向店长申请一下，有结果马上告诉您。这周末您有空的话，可以带家人来试驾看看。', used:['嫌贵砍价','担心车况'], emotion:'有明确购买意向，但对价格和车况都有顾虑；“这周就定”是在争取优惠。', tips:['不要直接答应便宜两万，优惠超过 3000 元需要走价格特批','主动发检测报告，不要说“绝对没问题”','不要评价“别家”的车，只讲自己这台车的依据']},
+  b3:{explain:'[客户]您好，按 XC60 车价 27.5 万、首付 30%、分 36 期、年化利率 4.5%（示例利率，以审批为准）给您算了一下：\n- 首付 8.25 万，贷款 19.25 万\n- 每月还款约 5,726.28 元，在您说的 7000 元以内\n- 36 期总利息约 13,646.19 元，没有额外服务费\n如果想月供再低一些，可以选 48 期，月供约 4,389.67 元，但总利息会增加到约 18,204.21 元；如果想少付利息，选 24 期，月供约 8,402.20 元，总利息约 9,152.89 元。\n最终能贷多少、利率多少，以金融机构审批结果为准，我可以帮您先做个预审。', fit:'36 期月供 5,726.28 元，满足“月供不超过 7000”；如果客户更在意少付利息，24 期会超出月供预算。', compliance:['说明里已写明“以金融机构审批结果为准”，不能改成“包过”','如果实际有 GPS 费、服务费等，必须写进总费用，不能只报月供','利率是示例值，正式报价前和金融专员确认当月政策']},
+  b4:{answer:'不能直接答应。根据《优惠审批》：销售可直接给予的优惠不超过 3000 元，3000-10000 元需要店长审批。8000 元属于店长审批范围，请在企业微信「审批 → 价格特批」提交，审批通过前不要向客户口头承诺。\n\n提成方面，根据《销售提成》：每台车提成 = 该车毛利 × 8%，当月交车满 5 台的部分按 10% 计；提成按交车结算，次月 15 日发放。\n\n另外，如果客户办理合作机构贷款并成功放款，根据《金融奖励》每单额外奖励 500 元。', sources:['优惠审批','销售提成','金融奖励'], found:true},
+  b5:{level:'高风险 · 不建议发布', issues:[
+    {quote:'全成都最低价', problem:'绝对化用语，违反《广告法》。', fix:'删除，改为“价格透明，欢迎比价”。'},
+    {quote:'准新车', problem:'没有写年份和里程，容易让人误以为是新车。', fix:'写明“2022 年上牌，2.8 万公里”。'},
+    {quote:'0首付0利息，无条件包过', problem:'承诺贷款必批、零首付零利息，与实际金融政策不符，属于误导性宣传。', fix:'改为“支持分期，首付比例和利率以金融机构审批为准”。'},
+    {quote:'绝对无事故', problem:'车况绝对化承诺，应以第三方检测报告为准。', fix:'改为“第三方检测无事故，报告可查”。'},
+    {quote:'原价 45 万', problem:'“原价”需真实可查，否则属于虚构原价。', fix:'删除原价对比，或写明“新车指导价 XX 万”并保留依据。'},
+    {quote:'仅剩最后1台，今天不来明天就没了', problem:'制造虚假紧迫感。', fix:'删除。'}
+  ], rewrite:'【名车推荐】2022 款沃尔沃 XC60 B5 四驱智远豪华版，2022 年上牌，2.8 万公里，银河灰。一手车，4S 店保养记录齐全，第三方检测无事故，报告可查。城市安全系统、自动紧急制动、四驱，适合家庭出行。售价 27.5 万，支持分期，首付比例和利率以金融机构审批为准。欢迎到店看车试驾。'},
+  b6:{headline:'周末活动带动进店和线索明显上升，但订单没有跟上，金融渗透率大幅下降，需要重点跟进今天的试驾客户。', changes:[
+    {metric:'进店客流', change:'+62%', reason:'“家庭 SUV 品鉴日”活动和懂车帝投放加倍共同带来。', action:'明天上午前把 68 组进店客户全部录入 CRM，按意向分级。'},
+    {metric:'订单', change:'-20%', reason:'进店和试驾都在涨，订单却下降，推测是活动现场客流大、销售跟进不过来（需店长核实）。', action:'今天试驾的 22 位客户 48 小时内全部回访，优先约二次到店。'},
+    {metric:'金融渗透率', change:'-38%', reason:'S400L 客户贷款审批未通过退订；推测部分销售活动当天没有主动介绍金融方案。', action:'晨会强调成交必问金融需求，金融专员明天到展厅值班。'}
+  ], tomorrow:['销售主管 10:00 前完成进店客户分级','金融专员复盘 S400L 审批失败原因，看能否换机构再审','车源部对 5 台库龄超 60 天的车给出调价建议'], risk:'库龄超 60 天的车增加到 5 台，资金占用上升，需要本周内处理。'},
+  c1:{questions:[
+    {q:'客户进店后，销售第一步应该做什么？', options:['直接推荐库龄最长的车','先了解客户的用车需求和预算','先报最低价吸引客户','先让客户填身份证信息'], answer:'B', explain:'先了解需求和预算，再推荐车辆。', rule:'第 1 条'},
+    {q:'检测报告显示车辆后门有补漆，向客户介绍时应该怎么做？', options:['不提，客户问了再说','主动告知，以检测报告为准','说是原厂漆','说“绝对没问题”'], answer:'B', explain:'报告上的瑕疵要主动告知客户。', rule:'第 2 条'},
+    {q:'客户要求优惠 5000 元，销售正确的做法是？', options:['直接答应','先口头答应，再补审批','走价格特批，审批通过前不承诺','拒绝客户'], answer:'C', explain:'超过 3000 元的优惠须走价格特批，未审批前不得承诺。', rule:'第 3 条'},
+    {q:'客户问“贷款能不能包过”，以下哪种回答是合规的？', options:['“放心，肯定包过”','“零首付无条件”','“以金融机构审批为准，我先帮您预审”','“别家都能包过，我们也能”'], answer:'C', explain:'贷款只能说明以审批为准，不得承诺包过。', rule:'第 4 条'},
+    {q:'客户发来身份证照片办理贷款，以下做法正确的是？', options:['转发到个人微信备份','上传到外部 AI 工具识别','只录入公司 CRM','截图发到销售群'], answer:'C', explain:'客户证件信息只能录入 CRM，不得外传或上传外部 AI 工具。', rule:'第 6 条'}
+  ]}
+};
+
+/* ================= 导航 ================= */
+function go(id){
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === id));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.go === id));
+  S.set('tab', id);
+  if(id === 'e1') E1.render();
+  if(id === 'd1'){ D1.renderLog(); D1.calc(); }
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => { Story.exitIfOff(b.dataset.go); go(b.dataset.go); });
+
+/* ================= 首页 ================= */
+const DUTIES = [
+  {n:'职责 1', t:'搭建 RAG 知识库、业务智能体、自动化工作流', tools:['b1','b2','b3','b6']},
+  {n:'职责 2', t:'写提示词、导入资料、降低 AI 幻觉', tools:['b4','b1'], note:'车源、话术、制度都“先检索再回答”，数字由程序计算'},
+  {n:'职责 3', t:'调研 AI 工具、管控 API 成本', tools:['d1','set']},
+  {n:'职责 4', t:'培训员工、收集反馈迭代', tools:['c1','e1']},
+  {n:'职责 5', t:'维护知识库，保障输出合规准确', tools:['b5','b4']},
+  {n:'起点', t:'先摸清各部门痛点，再决定做什么', tools:['a1']}
+];
+const DESC = {a1:'各部门填痛点，自动排出先做什么', b1:'按预算筛车，只推荐库里真有的车', b2:'砍价、车况、贷款顾虑一键回复', b3:'程序算月供，AI 只负责解释', b4:'提成、报销、审批，查不到就转人工', b5:'禁用词 + AI 双重审核车源文案', b6:'指标异动自动写成群日报', c1:'SOP 和话术禁忌自动出题', d1:'按调用量估算月成本，全程留痕', e1:'采纳率与节省工时', set:'一键切换 DeepSeek / Kimi / 智谱'};
+$('duties').innerHTML = DUTIES.map(d => `<div class="duty"><div class="dn">${d.n}</div><h4>${d.t}</h4><div class="tl">${d.tools.map(k => {
+  const nm = (TOOLS[k] || {}).name || (k === 'd1' ? 'API 成本与调用日志' : k === 'e1' ? '效果看板' : k === 'set' ? '设置与模型选型' : k);
+  return `<button onclick="go('${k}')"><b>${esc(nm)}</b>${esc(DESC[k] || '')}</button>`;
+}).join('')}</div>${d.note ? `<div class="note">${d.note}</div>` : ''}</div>`).join('');
+
+/* ================= A1 机会评估 ================= */
+const DATA_K = {'公开':1, '内部':0.8, '客户敏感':0.5};
+const A1 = {
+  rows: S.get('a1rows', null) || clone(SAMPLE.a1),
+  draw(){
+    $('a1tbl').querySelector('tbody').innerHTML = this.rows.map((r, i) => `<tr>
+      <td><input value="${esc(r.dept)}" oninput="A1.rows[${i}].dept=this.value;A1.keep()"></td>
+      <td><input value="${esc(r.task)}" oninput="A1.rows[${i}].task=this.value;A1.keep()"></td>
+      <td><input type="number" min="0" value="${esc(r.min)}" oninput="A1.rows[${i}].min=+this.value;A1.keep()"></td>
+      <td><input type="number" min="0" value="${esc(r.freq)}" oninput="A1.rows[${i}].freq=+this.value;A1.keep()"></td>
+      <td><select onchange="A1.rows[${i}].data=this.value;A1.keep()">${Object.keys(DATA_K).map(k => `<option ${k === r.data ? 'selected' : ''}>${k}</option>`).join('')}</select></td>
+      <td><button class="btn ghost sm" onclick="A1.rows.splice(${i},1);A1.keep();A1.draw()">删</button></td></tr>`).join('');
+  },
+  keep(){ S.set('a1rows', this.rows); },
+  add(){ this.rows.push({dept:'', task:'', min:10, freq:10, data:'内部'}); this.keep(); this.draw(); },
+  fill(){ this.rows = clone(SAMPLE.a1); this.keep(); this.draw(); $('a1out').innerHTML = ''; },
+  isSample(){ return JSON.stringify(this.rows) === JSON.stringify(SAMPLE.a1); },
+  async run(btn){
+    const rows = this.rows.filter(r => r.task.trim());
+    if(!rows.length) return showErr($('a1out'), '先填至少一行工作内容。');
+    await busy(btn, async () => {
+      loading($('a1out'), 'AI 正在评估每项工作的可行性…');
+      try{
+        const sys = '你是汽车销售门店的 AI 落地顾问。对每条重复性工作评估用 AI 提效的可行性（1-5 的整数，5 最可行），给出具体方案、推荐工具（优先 Coze、Dify、知识库、工作流、企业微信机器人和大模型）和风险提示。只输出 JSON：{"rows":[{"i":序号,"feasibility":整数,"plan":"一句话方案","tool":"工具组合","risk":"一句话风险"}],"summary":"整体建议，两三句"}';
+        const user = rows.map((r, i) => `${i + 1}. 部门：${r.dept}；工作：${r.task}；单次 ${r.min} 分钟；每周 ${r.freq} 次；涉及数据：${r.data}`).join('\n');
+        const r = await ai('a1', sys, user, this.isSample());
+        const res = rows.map((row, idx) => {
+          const a = (r.data.rows || []).find(x => +x.i === idx + 1) || {};
+          const hours = row.min * row.freq / 60, f = Math.max(1, Math.min(5, +a.feasibility || 3));
+          const score = hours * f * (DATA_K[row.data] || 0.8);
+          return Object.assign({}, row, a, {hours, f, score});
+        }).sort((a, b) => b.score - a.score);
+        const max = Math.max(...res.map(x => x.score), 1);
+        const tag = s => s >= 40 ? '<span class="pill p-ok">先做</span>' : s >= 15 ? '<span class="pill p-info">第二批</span>' : '<span class="pill p-warn">暂缓 / 顺手做</span>';
+        $('a1out').innerHTML = `<div class="card">${maskNote(r)}<h3>评估结果（按优先级分排序）</h3><div class="tw"><table><thead><tr><th>#</th><th>工作</th><th class="num">每周耗时</th><th class="num">可行性</th><th>数据</th><th style="min-width:150px">优先级分</th><th>结论</th></tr></thead><tbody>${res.map((x, i) => `<tr><td>${i + 1}</td><td><b>${esc(x.dept)}</b>：${esc(x.task)}<div class="note" style="margin-top:4px">方案：${esc(x.plan || '')}<br>工具：${esc(x.tool || '')}<br><span style="color:var(--warn)">风险：${esc(x.risk || '')}</span></div></td><td class="num">${x.hours.toFixed(1)} 小时</td><td class="num">${x.f} / 5</td><td>${esc(x.data)}</td><td><div class="num" style="text-align:left">${x.score.toFixed(0)}</div><div class="barw"><div class="bar" style="width:${(x.score / max * 100).toFixed(0)}%"></div></div></td><td>${tag(x.score)}</td></tr>`).join('')}</tbody></table></div><p style="margin:12px 0 0"><b>整体建议：</b>${esc(r.data.summary || '')}</p><p class="disc">优先级分 = 每周耗时（小时）× 可行性 × 数据系数。≥ 40 先做，15-40 第二批，&lt; 15 暂缓。</p>${tokNote(r)}${fb('a1')}</div>`;
+      }catch(e){ showErr($('a1out'), e); }
+    });
+  }
+};
+A1.draw();
+
+/* ================= B1 车源查询 ================= */
+const B1 = {
+  cars(){ return $('b1kb').value.split('\n').map(l => l.split(/[｜|]/).map(s => s.trim())).filter(p => p.length >= 12 && p[0]).map(p => ({id:p[0], model:p[1], year:p[2], km:p[3], color:p[4], price:+p[5], type:p[6], cond:p[7], feat:p[8], fit:p[9], days:+p[10], status:p[11]})); },
+  save(){ S.set('b1kb', $('b1kb').value); toast('已保存，只存在这台设备的浏览器里'); },
+  reset(){ $('b1kb').value = B1_DEFAULT; S.set('b1kb', B1_DEFAULT); },
+  fill(){ $('b1q').value = SAMPLE.b1q; $('b1out').innerHTML = ''; },
+  isSample(){ return $('b1q').value.trim() === SAMPLE.b1q && $('b1kb').value.trim() === B1_DEFAULT.trim(); },
+  budget(q){
+    let m = q.match(/(\d+(?:\.\d+)?)\s*万?\s*(?:到|至|-|~|—|－)\s*(\d+(?:\.\d+)?)\s*万/);
+    if(m) return {lo:+m[1] * 0.9, hi:+m[2] * 1.1, txt:`${m[1]}-${m[2]} 万（上下浮动 10%）`};
+    m = q.match(/(\d+(?:\.\d+)?)\s*万\s*(?:以内|以下|之内)/);
+    if(m) return {lo:0, hi:+m[1] * 1.05, txt:`${m[1]} 万以内`};
+    m = q.match(/预算\D{0,3}(\d+(?:\.\d+)?)\s*万/);
+    if(m) return {lo:+m[1] * 0.85, hi:+m[1] * 1.15, txt:`${m[1]} 万左右（上下浮动 15%）`};
+    return null;
+  },
+  search(){
+    const q = $('b1q').value.trim(), all = this.cars(), b = this.budget(q);
+    const pool = all.filter(c => c.status === '在售' && (!b || (c.price >= b.lo && c.price <= b.hi)));
+    const hits = rank(q, pool, c => `${c.type} ${c.type} ${c.fit} ${c.feat} ${c.model}`, 4);
+    return {all, b, pool, hits};
+  },
+  carHtml(c, extra = ''){ return `<div class="q" style="margin-bottom:8px"><b>${esc(c.id)} · ${esc(c.model)}</b> <span class="pill p-acc">${esc(c.price)} 万</span> <span class="pill p-info">${esc(c.type)}</span>
+    <div class="note" style="margin-top:4px">${esc(c.year)} 年 · ${esc(c.km)} 万公里 · ${esc(c.color)} · 在库 ${esc(c.days)} 天<br>车况：${esc(c.cond)}<br>配置：${esc(c.feat)}</div>${extra}</div>`; },
+  funnel(s){ return `<p class="note">车源库 ${s.all.length} 台 → 在售且预算内 ${s.pool.length} 台${s.b ? `（识别到预算：${esc(s.b.txt)}）` : '（未识别到预算，不按价格筛选）'} → 按需求检索 Top ${s.hits.length}。以上步骤均在本机完成，未调用 AI。</p>`; },
+  onlySearch(){
+    if(!$('b1q').value.trim()) return showErr($('b1out'), '先输入客户需求。');
+    const s = this.search();
+    $('b1out').innerHTML = `<div class="card"><h3>检索结果（未调用 AI）</h3>${this.funnel(s)}${s.hits.map(x => this.carHtml(x.d)).join('') || '<p class="note">没有匹配的在售车源。</p>'}</div>`;
+  },
+  aging(){
+    const old = this.cars().filter(c => c.status === '在售' && c.days > 60).sort((a, b) => b.days - a.days);
+    $('b1age').innerHTML = old.length ? `<div class="tw"><table><thead><tr><th>编号</th><th>车型</th><th class="num">售价</th><th class="num">在库天数</th><th>建议（规则生成，未调用 AI）</th></tr></thead><tbody>${old.map(c => `<tr><td>${esc(c.id)}</td><td>${esc(c.model)}</td><td class="num">${esc(c.price)} 万</td><td class="num" style="color:var(--bad);font-weight:700">${c.days}</td><td>${c.days > 90 ? '超 90 天：建议店长评估调价，并在本周重点推送' : '60-90 天：加大短视频曝光，销售优先推荐给匹配客户'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="note">没有库龄超过 60 天的车。</p>';
+  },
+  async run(btn){
+    const q = $('b1q').value.trim(); if(!q) return showErr($('b1out'), '先输入客户需求。');
+    const s = this.search();
+    await busy(btn, async () => {
+      loading($('b1out'), '正在筛选车源并生成推荐…');
+      try{
+        if(!s.hits.length){ $('b1out').innerHTML = `<div class="card">${this.funnel(s)}<div class="reply">车源库里暂时没有符合条件的在售车。建议放宽预算或车型，或登记客户需求，等新车源到店后通知。</div><p class="disc">未调用 AI：没有匹配车源时不让 AI 推荐，避免编造车辆。</p>${fb('b1')}</div>`; addLog({tool:'b1', mode:'未调用 AI', masked:0, types:'', maskOn:State.mask, tin:0, tout:0}); return; }
+        const ref = s.hits.map(x => { const c = x.d; return `【${c.id}】${c.model}｜${c.year}年｜${c.km}万公里｜${c.color}｜${c.price}万｜${c.type}｜车况：${c.cond}｜配置：${c.feat}｜适合：${c.fit}｜在库${c.days}天`; }).join('\n');
+        const sys = `你是名车销售门店的车源推荐助手。只能从下面检索到的车源里推荐，必须用编号引用；车况和配置只能引用车源原文，不得补充原文没有的配置；客户明确排除的条件（如颜色、车型）必须遵守，不符合的放进 excluded 并说明原因。推荐 1-3 台。客户信息里的代号（如 [姓名1]）原样保留。只输出 JSON：{"picks":[{"id":"编号","why":"推荐理由，引用车源原文","watch":"销售需要注意的一点"}],"excluded":[{"id":"编号","reason":"原因"}],"wechat":"发给客户的微信消息，列出推荐车型的年份、里程、颜色、价格和亮点，邀约到店试驾","ask":["还需要向客户确认的问题，2-3 条"]}\n\n检索到的车源：\n${ref}`;
+        const r = await ai('b1', sys, q, this.isSample());
+        const d = r.data, byId = Object.fromEntries(s.hits.map(x => [x.d.id, x.d]));
+        const picks = (d.picks || []).filter(p => byId[p.id]), blocked = (d.picks || []).filter(p => !byId[p.id]);
+        $('b1out').innerHTML = `<div class="card">${maskNote(r)}${this.funnel(s)}
+          <h3>推荐车源 <span class="muted" style="font-weight:400;font-size:13px">车辆信息直接取自车源库，不经过 AI</span></h3>
+          ${picks.map(p => this.carHtml(byId[p.id], `<p style="margin:6px 0 0"><b>推荐理由：</b>${esc(p.why)}</p><p class="note" style="margin:2px 0 0;color:var(--warn)">注意：${esc(p.watch || '')}</p>`)).join('')}
+          ${blocked.length ? `<div class="err" style="margin:8px 0">已拦截：AI 推荐了检索结果之外的车（${blocked.map(p => esc(p.id)).join('、')}），不予展示。</div>` : ''}
+          ${(d.excluded || []).length ? `<p style="margin:10px 0 2px"><b>检索到但不推荐：</b></p><ul class="tight">${d.excluded.map(x => `<li><b>${esc(x.id)}</b> ${esc((byId[x.id] || {}).model || '')}：${esc(x.reason)}</li>`).join('')}</ul>` : ''}
+          <h3 style="margin-top:14px">发给客户的微信消息</h3><div class="reply">${esc(d.wechat || '')}</div>
+          <div class="btns"><button class="btn ghost sm" onclick="copyText(B1.msg, this)">复制消息</button></div>
+          <p style="margin:10px 0 2px"><b>还要向客户确认：</b></p><ul class="tight">${(d.ask || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+          ${tokNote(r)}${fb('b1')}</div>`;
+        this.msg = d.wechat || '';
+      }catch(e){ showErr($('b1out'), e); }
+    });
+  }
+};
+$('b1kb').value = S.get('b1kb', B1_DEFAULT);
+
+/* ================= B2 话术助手 ================= */
+const B2 = {
+  kb(){ return $('b2kb').value.split('\n').map(l => l.split(/[｜|]/).map(s => s.trim())).filter(p => p.length >= 4).map(p => ({scene:p[0], say:p[1], std:p[2], ban:p[3]})); },
+  save(){ S.set('b2kb', $('b2kb').value); toast('已保存，只存在这台设备的浏览器里'); },
+  reset(){ $('b2kb').value = B2_DEFAULT; S.set('b2kb', B2_DEFAULT); },
+  fill(){ $('b2m').value = SAMPLE.b2m; $('b2out').innerHTML = ''; },
+  isSample(){ return $('b2m').value.trim() === SAMPLE.b2m && $('b2kb').value.trim() === B2_DEFAULT.trim(); },
+  async run(btn){
+    const msg = $('b2m').value.trim(); if(!msg) return showErr($('b2out'), '先贴入客户原话。');
+    const h = rank(msg, this.kb(), d => d.scene + ' ' + d.say + ' ' + d.say);
+    await busy(btn, async () => {
+      loading($('b2out'), '正在检索话术并生成回复…');
+      try{
+        const ref = h.length ? h.map(x => `【${x.d.scene}】标准话术：${x.d.std}；禁忌：${x.d.ban}`).join('\n') : '（话术库没有匹配条目，请按通用礼仪回复，并在 tips 中提醒销售补充话术）';
+        const sys = `你是名车销售门店的话术助手。根据下面检索到的标准话术，为销售写一条可以直接发给客户的微信回复。要求：真诚、简洁，不超出标准话术的承诺范围；优惠金额、提车日期、贷款结果一律不承诺；不编造车况。客户信息里的代号原样保留。只输出 JSON：{"reply":"回复","used":["用到的场景名"],"emotion":"客户意向和情绪判断，一句话","tips":["给销售的提醒，2-3 条"]}\n\n检索到的标准话术：\n${ref}`;
+        const r = await ai('b2', sys, msg, this.isSample());
+        const d = r.data; this.msg = d.reply || '';
+        $('b2out').innerHTML = `<div class="card">${maskNote(r)}
+          <h3>建议回复</h3><div class="reply">${esc(d.reply)}</div>
+          <div class="btns"><button class="btn ghost sm" onclick="copyText(B2.msg, this)">复制回复</button></div>
+          <p style="margin:12px 0 4px"><b>客户判断：</b>${esc(d.emotion || '')}</p>
+          <p style="margin:4px 0"><b>用到的话术：</b>${(d.used || []).map(s => `<span class="pill p-acc">${esc(s)}</span>`).join(' ') || '无匹配，需补充话术'}</p>
+          <p style="margin:8px 0 2px"><b>给销售的提醒：</b></p><ul class="tight">${(d.tips || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+          <details style="margin-top:8px"><summary class="note" style="cursor:pointer">查看检索到的 ${h.length} 条话术</summary>${h.map((x, i) => `<div style="margin:6px 0"><span class="pill p-acc">Top ${i + 1}</span> <b>${esc(x.d.scene)}</b><div class="note">${esc(x.d.std)}<br><span style="color:var(--bad)">禁忌：${esc(x.d.ban)}</span></div></div>`).join('')}</details>
+          ${tokNote(r)}${fb('b2')}</div>`;
+      }catch(e){ showErr($('b2out'), e); }
+    });
+  }
+};
+$('b2kb').value = S.get('b2kb', B2_DEFAULT);
+
+/* ================= B3 金融方案 ================= */
+const B3 = {
+  fill(){ const s = SAMPLE.b3; $('b3p').value = s.p; $('b3d').value = s.d; $('b3n').value = s.n; $('b3r').value = s.r; $('b3f').value = s.f; $('b3c').value = s.c; $('b3out').innerHTML = ''; },
+  isSample(){ const s = SAMPLE.b3; return +$('b3p').value === s.p && $('b3d').value === s.d && $('b3n').value === s.n && $('b3r').value === s.r && $('b3f').value === s.f && $('b3c').value.trim() === s.c; },
+  plan(n){
+    const P = +$('b3p').value * 10000, d = +$('b3d').value, rate = +$('b3r').value / 100 / 12, fee = +$('b3f').value || 0;
+    const down = P * d, loan = P - down;
+    const m = rate === 0 ? loan / n : loan * rate * Math.pow(1 + rate, n) / (Math.pow(1 + rate, n) - 1);
+    const interest = m * n - loan;
+    return {n, down, loan, m, interest, fee, total: down + m * n + fee};
+  },
+  calc(){
+    if(!(+$('b3p').value > 0)) throw new Error('先填车价。');
+    const n = +$('b3n').value, ns = [...new Set([24, 36, 48, n])].sort((a, b) => a - b);
+    return {main: this.plan(n), list: ns.map(x => this.plan(x))};
+  },
+  table(c){
+    return `<h3>方案对比 <span class="muted" style="font-weight:400;font-size:13px">本地按等额本息计算，未调用 AI</span></h3><div class="tw"><table><thead><tr><th>期数</th><th class="num">首付（元）</th><th class="num">贷款（元）</th><th class="num">月供（元）</th><th class="num">总利息（元）</th><th class="num">服务费（元）</th><th class="num">总支出（元）</th></tr></thead><tbody>${c.list.map(p => `<tr ${p.n === c.main.n ? 'style="background:var(--accbg)"' : ''}><td><b>${p.n} 期</b>${p.n === c.main.n ? ' <span class="pill p-acc">当前方案</span>' : ''}</td><td class="num">${yuan(p.down)}</td><td class="num">${yuan(p.loan)}</td><td class="num"><b>${yuan(p.m)}</b></td><td class="num">${yuan(p.interest)}</td><td class="num">${yuan(p.fee)}</td><td class="num">${yuan(p.total)}</td></tr>`).join('')}</tbody></table></div>`;
+  },
+  calcOnly(){ try{ $('b3out').innerHTML = `<div class="card">${this.table(this.calc())}</div>`; }catch(e){ showErr($('b3out'), e); } },
+  async run(btn){
+    let c; try{ c = this.calc(); }catch(e){ return showErr($('b3out'), e); }
+    await busy(btn, async () => {
+      $('b3out').innerHTML = `<div class="card">${this.table(c)}</div><div class="card loading"><div class="spin"></div>AI 正在写客户说明…</div>`;
+      try{
+        const nums = c.list.map(p => `${p.n} 期：首付 ${yuan(p.down)} 元，贷款 ${yuan(p.loan)} 元，月供 ${yuan(p.m)} 元，总利息 ${yuan(p.interest)} 元，服务费 ${yuan(p.fee)} 元`).join('\n');
+        const sys = `你是汽车金融专员的助手。下面的数字已经由程序算好，你只能原样引用，不得重新计算或修改。车价 ${$('b3p').value} 万，首付比例 ${Math.round(+$('b3d').value * 100)}%，年化利率 ${$('b3r').value}%（示例利率，以审批为准），客户当前选择 ${c.main.n} 期。\n${nums}\n请根据客户关注点写一段发给客户的微信说明，用“[客户]”称呼客户；必须写明“以金融机构审批结果为准”，不得出现包过、零首付无条件等表述。只输出 JSON：{"explain":"给客户的说明，可以用短列表","fit":"当前方案是否满足客户关注点，一句话","compliance":["合规提醒，2-3 条"]}`;
+        const r = await ai('b3', sys, '客户关注点：' + ($('b3c').value.trim() || '无'), this.isSample());
+        const d = r.data; this.msg = d.explain || '';
+        $('b3out').innerHTML = `<div class="card">${this.table(c)}</div><div class="card">${maskNote(r)}
+          <h3>给客户的说明</h3><div class="reply" style="white-space:normal">${md(d.explain || '')}</div>
+          <div class="btns"><button class="btn ghost sm" onclick="copyText(B3.msg, this)">复制说明</button></div>
+          <p style="margin:12px 0 4px"><b>是否满足客户关注点：</b>${esc(d.fit || '')}</p>
+          <p style="margin:8px 0 2px"><b>合规提醒：</b></p><ul class="tight">${(d.compliance || []).map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+          ${tokNote(r)}${fb('b3')}</div>`;
+      }catch(e){ $('b3out').innerHTML = `<div class="card">${this.table(c)}</div>`; $('b3out').insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`); }
+    });
+  }
+};
+B3.fill();
+
+/* ================= B4 制度问答 ================= */
+const B4 = {
+  kb(){ return $('b4kb').value.split('\n').map(l => l.split(/[｜|]/)).filter(p => p.length >= 2 && p[0].trim()).map(p => ({title:p[0].trim(), body:p.slice(1).join('｜').trim()})); },
+  save(){ S.set('b4kb', $('b4kb').value); toast('已保存，只存在这台设备的浏览器里'); },
+  reset(){ $('b4kb').value = B4_DEFAULT; S.set('b4kb', B4_DEFAULT); },
+  fill(){ $('b4q').value = SAMPLE.b4q; $('b4out').innerHTML = ''; },
+  isSample(){ return $('b4q').value.trim() === SAMPLE.b4q && $('b4kb').value.trim() === B4_DEFAULT.trim(); },
+  hits(){ return rank($('b4q').value, this.kb(), d => d.title + ' ' + d.title + ' ' + d.body); },
+  hitsHtml(h){ return h.length ? h.map((x, i) => `<div style="margin:6px 0"><span class="pill p-acc">Top ${i + 1}</span> <b>${esc(x.d.title)}</b> <span class="muted">（匹配度 ${x.score}）</span><div class="note">${esc(x.d.body)}</div></div>`).join('') : '<p class="note">知识库里没有找到相关条目。</p>'; },
+  onlySearch(){
+    if(!$('b4q').value.trim()) return showErr($('b4out'), '先输入问题。');
+    $('b4out').innerHTML = `<div class="card"><h3>检索结果（未调用 AI）</h3>${this.hitsHtml(this.hits())}</div>`;
+  },
+  async run(btn){
+    const q = $('b4q').value.trim(); if(!q) return showErr($('b4out'), '先输入问题。');
+    const h = this.hits();
+    await busy(btn, async () => {
+      loading($('b4out'), '正在检索制度并组织回答…');
+      try{
+        if(!h.length){ $('b4out').innerHTML = `<div class="card"><div class="reply">制度知识库里没有找到相关规定，我不确定答案。已为你转给人事 / 财务，请稍候或直接联系。</div><p class="disc">未调用 AI：检索结果为空时直接转人工，避免 AI 编造制度。</p>${fb('b4')}</div>`; addLog({tool:'b4', mode:'未调用 AI', masked:0, types:'', maskOn:State.mask, tin:0, tout:0}); return; }
+        const sys = '你是汽车销售公司的内部制度问答助手。只能根据下面提供的制度条目回答，不得补充条目以外的规定；条目没有覆盖的部分，明确说“知识库里没有相关规定，请咨询人事或财务”。回答时注明依据哪一条，简洁清楚。只输出 JSON：{"answer":"回答","sources":["引用的条目标题"],"found":true或false}\n\n制度条目：\n' + h.map(x => `【${x.d.title}】${x.d.body}`).join('\n');
+        const r = await ai('b4', sys, q, this.isSample());
+        $('b4out').innerHTML = `<div class="card">${maskNote(r)}<h3>回答</h3><div class="reply" style="white-space:normal">${md(r.data.answer || '')}</div><p class="note" style="margin-top:10px">出处：${(r.data.sources || []).map(s => `<span class="pill p-acc">${esc(s)}</span>`).join(' ') || '无'}</p><details style="margin-top:8px"><summary class="note" style="cursor:pointer">查看检索到的 ${h.length} 条制度</summary>${this.hitsHtml(h)}</details>${tokNote(r)}${fb('b4')}</div>`;
+      }catch(e){ showErr($('b4out'), e); }
+    });
+  }
+};
+$('b4kb').value = S.get('b4kb', B4_DEFAULT);
+
+/* ================= B5 文案合规 ================= */
+const B5 = {
+  fill(){ $('b5ch').value = '朋友圈'; $('b5t').value = SAMPLE.b5t; $('b5out').innerHTML = ''; },
+  isSample(){ return $('b5t').value.trim() === SAMPLE.b5t && $('b5ch').value === '朋友圈'; },
+  scan(){
+    const t = $('b5t').value, low = t.toLowerCase().replace(/\s+/g, ''), hits = [];
+    for(const [w, lv, why] of BANNED) if(low.includes(w.toLowerCase())) hits.push({w, lv, why});
+    let marked = esc(t);
+    hits.forEach(h => { const pat = esc(h.w).split('').map(ch => ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*'); marked = marked.replace(new RegExp(pat, 'gi'), m => `<span class="hl">${m}</span>`); });
+    return {hits, marked};
+  },
+  scanHtml(s){
+    return `<h3>① 禁用词扫描 <span class="muted" style="font-weight:400;font-size:13px">本地完成，未调用 AI</span></h3><div class="reply" style="white-space:pre-wrap">${s.marked}</div>
+      ${s.hits.length ? `<div class="tw" style="margin-top:10px"><table><thead><tr><th>命中词</th><th>等级</th><th>原因</th></tr></thead><tbody>${s.hits.map(h => `<tr><td><b>${esc(h.w)}</b></td><td><span class="pill ${h.lv === '高' ? 'p-bad' : 'p-warn'}">${h.lv}</span></td><td>${esc(h.why)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="note">未命中禁用词。</p>'}`;
+  },
+  scanOnly(){ if(!$('b5t').value.trim()) return showErr($('b5out'), '先输入文案。'); $('b5out').innerHTML = `<div class="card">${this.scanHtml(this.scan())}</div>`; },
+  async run(btn){
+    const t = $('b5t').value.trim(); if(!t) return showErr($('b5out'), '先输入文案。');
+    const s = this.scan();
+    await busy(btn, async () => {
+      $('b5out').innerHTML = `<div class="card">${this.scanHtml(s)}</div><div class="card loading"><div class="spin"></div>② AI 正在按规则审核…</div>`;
+      try{
+        const sys = `你是汽车销售公司的营销文案合规审核员，发布渠道：${$('b5ch').value}。按以下规则审核：1 不得使用“最、第一、顶级”等绝对化用语；2 贷款宣传须写明以金融机构审批为准，不得承诺包过、零首付零利息无条件；3 车况描述以第三方检测报告为准，不得绝对化承诺；4 “原价”须真实可查；5 不得制造虚假紧迫感；6 二手车须写明上牌年份和里程。本地词库已命中：${s.hits.map(h => h.w).join('、') || '无'}。只输出 JSON：{"level":"风险等级与是否可发布，一句话","issues":[{"quote":"原文片段，缺失项写（缺失）","problem":"问题","fix":"修改建议"}],"rewrite":"合规改写版本，保留卖点"}`;
+        const r = await ai('b5', sys, t, this.isSample());
+        const d = r.data, high = /高|不建议|不可/.test(d.level || ''); this.msg = d.rewrite || '';
+        $('b5out').innerHTML = `<div class="card">${this.scanHtml(s)}</div><div class="card">${maskNote(r)}<h3>② AI 规则审核 <span class="pill ${high ? 'p-bad' : 'p-ok'}">${esc(d.level || '')}</span></h3>
+          <div class="tw"><table><thead><tr><th style="min-width:130px">原文</th><th>问题</th><th>修改建议</th></tr></thead><tbody>${(d.issues || []).map(i => `<tr><td><b>${esc(i.quote)}</b></td><td>${esc(i.problem)}</td><td>${esc(i.fix)}</td></tr>`).join('')}</tbody></table></div>
+          <h3 style="margin-top:12px">合规改写版本</h3><div class="reply">${esc(d.rewrite || '')}</div>
+          <div class="btns"><button class="btn ghost sm" onclick="copyText(B5.msg, this)">复制改写稿</button></div>
+          ${high ? '<p class="note" style="margin-top:10px;color:var(--bad)">高风险：正式版会自动推送给店长确认，确认后才能发布。</p>' : ''}
+          ${tokNote(r)}${fb('b5')}</div>`;
+      }catch(e){ $('b5out').innerHTML = `<div class="card">${this.scanHtml(s)}</div>`; $('b5out').insertAdjacentHTML('beforeend', `<div class="err">${esc(e.message)}</div>`); }
+    });
+  }
+};
+
+/* ================= B6 销售日报 ================= */
+const B6 = {
+  rows: clone(SAMPLE.b6),
+  draw(){
+    $('b6tbl').querySelector('tbody').innerHTML = this.rows.map((r, i) => `<tr><td>${esc(r[0])}</td>
+      <td><input value="${esc(r[1])}" oninput="B6.rows[${i}][1]=this.value;B6.chg()"></td>
+      <td><input value="${esc(r[2])}" oninput="B6.rows[${i}][2]=this.value;B6.chg()"></td>
+      <td>${esc(r[3])}</td><td class="num" id="b6c${i}"></td></tr>`).join('');
+    this.chg();
+  },
+  pct(r){ const a = parseFloat(r[1]), b = parseFloat(r[2]); if(!isFinite(a) || !isFinite(b) || a === 0) return null; return (b - a) / a * 100; },
+  chg(){ this.rows.forEach((r, i) => { const p = this.pct(r), el = $('b6c' + i); if(!el) return; if(p === null){ el.textContent = '—'; return; } el.textContent = (p > 0 ? '+' : '') + p.toFixed(0) + '%'; el.style.color = Math.abs(p) >= 30 ? 'var(--bad)' : 'var(--ink2)'; el.style.fontWeight = Math.abs(p) >= 30 ? 700 : 400; }); },
+  fill(){ this.rows = clone(SAMPLE.b6); $('b6n').value = SAMPLE.b6n; this.draw(); $('b6out').innerHTML = ''; },
+  isSample(){ return JSON.stringify(this.rows) === JSON.stringify(SAMPLE.b6) && $('b6n').value.trim() === SAMPLE.b6n; },
+  async run(btn){
+    await busy(btn, async () => {
+      loading($('b6out'), 'AI 正在分析异动并撰写日报…');
+      try{
+        const tbl = this.rows.map(r => { const p = this.pct(r); return `${r[0]}：昨日 ${r[1]}${r[3]}，今日 ${r[2]}${r[3]}，变化 ${p === null ? '—' : (p > 0 ? '+' : '') + p.toFixed(0) + '%'}`; }).join('\n');
+        const sys = '你是汽车销售门店的数据分析助手。根据今日与昨日指标和当日事件，写一份给店长和总经理的日报：找出最值得关注的 3 个异动（不一定是涨跌最大的，而是对成交影响最大的），推测原因（推测要写明“推测”），给出可执行动作。涨跌幅已由程序算好，直接引用。只输出 JSON：{"headline":"一句话结论","changes":[{"metric":"","change":"如 +62%","reason":"","action":""}],"tomorrow":["明日待办，3 条"],"risk":"风险提示，一句话"}';
+        const r = await ai('b6', sys, tbl + '\n\n当日事件：' + ($('b6n').value.trim() || '无'), this.isSample());
+        const d = r.data, today = new Date();
+        const msg = `【门店销售日报 · ${today.getMonth() + 1} 月 ${today.getDate()} 日】\n${d.headline}\n\n重点异动：\n${(d.changes || []).map((c, i) => `${i + 1}. ${c.metric} ${c.change}：${c.reason} → ${c.action}`).join('\n')}\n\n明日待办：\n${(d.tomorrow || []).map(x => '· ' + x).join('\n')}\n\n风险提示：${d.risk}`;
+        this.msg = msg;
+        $('b6out').innerHTML = `<div class="card">${maskNote(r)}<h3>日报</h3><p style="margin:0 0 10px"><b>${esc(d.headline)}</b></p>
+          <div class="tw"><table><thead><tr><th>指标</th><th class="num">变化</th><th>原因</th><th>动作</th></tr></thead><tbody>${(d.changes || []).map(c => `<tr><td><b>${esc(c.metric)}</b></td><td class="num" style="color:var(--bad);font-weight:700">${esc(c.change)}</td><td>${esc(c.reason)}</td><td>${esc(c.action)}</td></tr>`).join('')}</tbody></table></div>
+          <p style="margin:12px 0 2px"><b>明日待办</b></p><ul class="tight">${(d.tomorrow || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+          <p style="margin:8px 0;color:var(--warn)"><b>风险提示：</b>${esc(d.risk)}</p>
+          <h3 style="margin-top:16px">企业微信群消息预览</h3><div class="feishu">${esc(msg)}</div>
+          <div class="btns"><button class="btn ghost sm" onclick="copyText(B6.msg, this)">复制为群消息</button></div>
+          ${tokNote(r)}${fb('b6')}</div>`;
+      }catch(e){ showErr($('b6out'), e); }
+    });
+  }
+};
+B6.draw(); $('b6n').value = SAMPLE.b6n;
+
+/* ================= C1 培训题库 ================= */
+const C1 = {
+  qs: [],
+  fill(){ $('c1t').value = SAMPLE.c1t; $('c1n').value = '5'; $('c1d').value = '新人入门'; $('c1out').innerHTML = ''; },
+  isSample(){ return $('c1t').value.trim() === SAMPLE.c1t.trim() && $('c1n').value === '5'; },
+  async run(btn){
+    const t = $('c1t').value.trim(); if(!t) return showErr($('c1out'), '先填出题依据。');
+    await busy(btn, async () => {
+      loading($('c1out'), 'AI 正在出题…');
+      try{
+        const sys = `你是汽车销售门店的培训出题助手。根据给定的 SOP 出 ${$('c1n').value} 道单选题，难度：${$('c1d').value}。每题 4 个选项，只有 1 个正确，干扰项要像销售现场真会犯的错。只输出 JSON：{"questions":[{"q":"题干","options":["内容","内容","内容","内容"],"answer":"A/B/C/D","explain":"解析，一句话","rule":"对应条款"}]}，options 里不要带字母前缀。`;
+        const r = await ai('c1', sys, t, this.isSample());
+        this.qs = r.data.questions || [];
+        this.draw(r);
+      }catch(e){ showErr($('c1out'), e); }
+    });
+  },
+  draw(r){
+    const L = ['A','B','C','D'];
+    $('c1out').innerHTML = `<div class="card">${maskNote(r)}<h3>共 ${this.qs.length} 道题 <span class="muted" style="font-weight:400;font-size:13px">点选项作答，答完显示解析</span></h3>
+      ${this.qs.map((q, i) => `<div class="q" id="cq${i}"><b>${i + 1}. ${esc(q.q)}</b> <span class="pill p-info">${esc(q.rule || '')}</span>
+        <div class="opts">${(q.options || []).map((o, j) => `<button onclick="C1.ans(${i},${j})">${L[j]}. ${esc(String(o).replace(/^[A-D][.、．]\s*/, ''))}</button>`).join('')}</div>
+        <div class="ex">正确答案：<b>${esc(q.answer)}</b>。${esc(q.explain)}</div></div>`).join('')}
+      <div class="btns"><button class="btn ghost sm" onclick="C1.csv()">导出 CSV（可导入在线表格做考试）</button></div>
+      ${tokNote(r)}${fb('c1')}</div>`;
+  },
+  ans(i, j){
+    const q = this.qs[i], box = $('cq' + i); if(box.classList.contains('done')) return;
+    const right = ['A','B','C','D'].indexOf(String(q.answer).trim().charAt(0).toUpperCase());
+    const bs = box.querySelectorAll('.opts button');
+    bs[right] && bs[right].classList.add('right'); if(j !== right) bs[j].classList.add('wrong');
+    box.classList.add('done');
+  },
+  csv(){
+    const head = ['题号','题干','选项A','选项B','选项C','选项D','答案','解析','对应条款'];
+    const rows = this.qs.map((q, i) => [i + 1, q.q, ...(q.options || []).map(o => String(o).replace(/^[A-D][.、．]\s*/, '')), q.answer, q.explain, q.rule]);
+    download('新人培训题库.csv', [head, ...rows].map(r => r.map(csvCell).join(',')).join('\n'));
+  }
+};
+$('c1t').value = SAMPLE.c1t;
+
+/* ================= D1 成本与日志 ================= */
+const COST_DEFAULT = {pin:2, pout:8, days:30, rows:{b1:[60,1500,500], b2:[40,1200,400], b3:[15,900,500], b4:[20,1000,300], b5:[5,900,700], b6:[1,800,600], c1:[0.2,1500,2000]}};
+const FULL_IN = {b1:36000, b2:6000, b4:15000};  // 不检索、整表发给 AI 时的输入 token（按 300 台车、完整话术库、完整员工手册估算）
+const D1 = {
+  cfg: S.get('cost', null) || clone(COST_DEFAULT),
+  draw(){
+    $('d1pin').value = this.cfg.pin; $('d1pout').value = this.cfg.pout; $('d1days').value = this.cfg.days;
+    $('d1tbl').querySelector('tbody').innerHTML = Object.entries(this.cfg.rows).map(([k, r]) => `<tr><td>${esc(TOOLS[k].name)}</td>
+      ${r.map((v, j) => `<td><input type="number" min="0" step="any" value="${v}" oninput="D1.cfg.rows['${k}'][${j}]=+this.value;D1.calc()"></td>`).join('')}<td class="num" id="d1c_${k}"></td></tr>`).join('');
+    ['d1pin','d1pout','d1days'].forEach((id, j) => $(id).oninput = () => { this.cfg[['pin','pout','days'][j]] = +$(id).value; this.calc(); });
+    this.calc();
+  },
+  cost(calls, tin, tout){ return calls * this.cfg.days * (tin * this.cfg.pin + tout * this.cfg.pout) / 1e6; },
+  calc(){
+    S.set('cost', this.cfg);
+    let total = 0, calls = 0;
+    for(const [k, r] of Object.entries(this.cfg.rows)){ const c = this.cost(r[0], r[1], r[2]); total += c; calls += r[0] * this.cfg.days; const el = $('d1c_' + k); if(el) el.textContent = c.toFixed(2); }
+    const log = S.get('log', []).filter(x => !x.sim && x.mode === '实时调用');
+    const real = log.reduce((a, x) => a + ((x.tin || 0) * this.cfg.pin + (x.tout || 0) * this.cfg.pout) / 1e6, 0);
+    $('d1sum').innerHTML = `<div class="kpis" style="margin:8px 0 0"><div class="kpi"><div class="v">${Math.round(calls).toLocaleString()}</div><div class="l">每月调用次数</div></div><div class="kpi"><div class="v">¥${total.toFixed(0)}</div><div class="l">预计月成本</div></div><div class="kpi"><div class="v">¥${(total / Math.max(calls, 1) * 100).toFixed(2)}</div><div class="l">每 100 次调用成本</div></div><div class="kpi"><div class="v">¥${real.toFixed(4)}</div><div class="l">本机实时调用累计花费</div></div></div>`;
+  },
+  compare(){
+    const rows = Object.entries(FULL_IN).map(([k, full]) => { const r = this.cfg.rows[k]; const now = this.cost(r[0], r[1], r[2]), bad = this.cost(r[0], full, r[2]); return {k, now, bad, r, full}; });
+    const a = rows.reduce((s, x) => s + x.now, 0), b = rows.reduce((s, x) => s + x.bad, 0);
+    $('d1cmp').innerHTML = `<div class="tw"><table><thead><tr><th>工具</th><th class="num">先检索：每次输入</th><th class="num">整表上传：每次输入</th><th class="num">先检索：月成本</th><th class="num">整表上传：月成本</th></tr></thead><tbody>${rows.map(x => `<tr><td>${esc(TOOLS[x.k].name)}</td><td class="num">${x.r[1].toLocaleString()}</td><td class="num">${x.full.toLocaleString()}</td><td class="num">¥${x.now.toFixed(2)}</td><td class="num" style="color:var(--bad)">¥${x.bad.toFixed(2)}</td></tr>`).join('')}</tbody></table></div><p class="note" style="margin-top:8px">这三个工具整表上传的成本约是先检索的 <b>${(b / Math.max(a, 0.01)).toFixed(1)} 倍</b>。钱是一方面，更重要的是：资料越多，AI 越容易“看串”，编造配置或制度的概率越高，回答也越慢。</p>`;
+  },
+  reset(){ this.cfg = clone(COST_DEFAULT); this.draw(); $('d1cmp').innerHTML = ''; },
+  fillMask(){ $('d1in').value = SAMPLE.mask; this.runMask(); },
+  runMask(){
+    const r = mask($('d1in').value);
+    $('d1view').innerHTML = tokHtml(r.text) || '<span class="muted">在左边输入内容后点“脱敏预览”</span>';
+    $('d1map').innerHTML = r.items.length ? `<div class="tw"><table><thead><tr><th>代号</th><th>类型</th><th>原文（只保存在本机）</th></tr></thead><tbody>${r.items.map(i => `<tr><td><span class="tok">${esc(i.t)}</span></td><td>${esc(i.type)}</td><td>${esc(i.val)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="note">没有发现需要替换的信息。</p>';
+  },
+  saveNames(){ S.set('names', $('d1names').value.split('\n').map(s => s.trim()).filter(Boolean)); toast('已保存，只存在这台设备的浏览器里'); },
+  renderLog(){
+    const l = S.get('log', []).filter(x => !x.sim).slice(-30).reverse();
+    $('d1log').innerHTML = l.length ? `<div class="tw"><table><thead><tr><th>时间</th><th>工具</th><th>模式</th><th>脱敏</th><th class="num">替换处数</th><th class="num">输入 token</th><th class="num">输出 token</th></tr></thead><tbody>${l.map(x => `<tr><td>${new Date(x.ts).toLocaleString('zh-CN', {hour12:false})}</td><td>${esc((TOOLS[x.tool] || {}).name || x.tool)}</td><td>${esc(x.mode)}</td><td>${x.maskOn ? '<span class="pill p-ok">开</span>' : '<span class="pill p-warn">关</span>'}</td><td class="num">${x.masked}</td><td class="num">${x.tin ?? '—'}</td><td class="num">${x.tout ?? '—'}</td></tr>`).join('')}</tbody></table></div><p class="disc">显示最近 30 条。</p>` : '<p class="note">还没有调用记录。运行任意工具后，这里会出现一条记录。</p>';
+  },
+  exportLog(){
+    const l = S.get('log', []).filter(x => !x.sim);
+    download('AI调用日志.csv', [['时间','工具','模式','脱敏开关','替换处数','输入token','输出token'], ...l.map(x => [new Date(x.ts).toLocaleString('zh-CN', {hour12:false}), (TOOLS[x.tool] || {}).name || x.tool, x.mode, x.maskOn ? '开' : '关', x.masked, x.tin, x.tout])].map(r => r.map(csvCell).join(',')).join('\n'));
+  },
+  clearLog(btn){ confirmClick(btn, '再点一次确认清空', () => { S.set('log', S.get('log', []).filter(x => x.sim)); this.renderLog(); toast('调用日志已清空'); }); }
+};
+D1.draw();
+$('d1names').value = names().join('\n');
+
+/* ================= E1 效果看板 ================= */
+const E1 = {
+  render(){
+    const log = S.get('log', []), fbs = S.get('fb', []);
+    const stat = Object.keys(TOOLS).map(k => {
+      const runs = log.filter(x => x.tool === k).length, up = fbs.filter(x => x.tool === k && x.v === 'up').length, down = fbs.filter(x => x.tool === k && x.v === 'down').length;
+      const rate = up + down ? up / (up + down) : null, saved = up * TOOLS[k].base / 60;
+      return {k, runs, up, down, rate, saved};
+    });
+    const runs = stat.reduce((a, x) => a + x.runs, 0), up = stat.reduce((a, x) => a + x.up, 0), down = stat.reduce((a, x) => a + x.down, 0);
+    const saved = stat.reduce((a, x) => a + x.saved, 0);
+    const cost = log.reduce((a, x) => a + ((x.tin || 0) * D1.cfg.pin + (x.tout || 0) * D1.cfg.pout) / 1e6, 0);
+    $('e1kpi').innerHTML = [
+      [runs, '总调用次数'], [up + down ? Math.round(up / (up + down) * 100) + '%' : '—', '采纳率（有用 ÷ 已反馈）'], [saved.toFixed(1), '累计节省工时（小时）'], ['¥' + cost.toFixed(2), '累计 API 花费（按设置单价）']
+    ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+    const max = Math.max(...stat.map(x => x.saved), 0.01);
+    $('e1tbl').innerHTML = `<table><thead><tr><th>工具</th><th>服务部门</th><th class="num">调用</th><th class="num">有用</th><th class="num">没用</th><th class="num">采纳率</th><th class="num">基准耗时</th><th style="min-width:160px">节省工时</th></tr></thead><tbody>${stat.map(x => `<tr><td><b>${esc(TOOLS[x.k].name)}</b></td><td>${esc(TOOLS[x.k].dept)}</td><td class="num">${x.runs}</td><td class="num">${x.up}</td><td class="num">${x.down}</td><td class="num">${x.rate === null ? '—' : Math.round(x.rate * 100) + '%'}</td><td class="num">${TOOLS[x.k].base} 分钟</td><td><div class="num" style="text-align:left">${x.saved.toFixed(1)} 小时</div><div class="barw"><div class="bar" style="width:${(x.saved / max * 100).toFixed(0)}%"></div></div></td></tr>`).join('')}</tbody></table>`;
+    const bad = fbs.filter(x => x.v === 'down').slice(-8).reverse();
+    $('e1bad').innerHTML = bad.length ? `<table><thead><tr><th>时间</th><th>工具</th><th>反馈</th></tr></thead><tbody>${bad.map(x => `<tr><td>${new Date(x.ts).toLocaleDateString('zh-CN')}</td><td>${esc((TOOLS[x.tool] || {}).name || x.tool)}</td><td>${esc(x.note || '（未填写原因）')}</td></tr>`).join('')}</tbody></table>` : '<p class="note">暂时没有“没用”的反馈。</p>';
+  },
+  sim(){
+    const log = S.get('log', []).filter(x => !x.sim), fbs = S.get('fb', []).filter(x => !x.sim), now = Date.now(), day = 86400000;
+    const plan = {a1:[8, .9], b1:[1650, .84], b2:[1100, .8], b3:[420, .88], b4:[560, .9], b5:[140, .76], b6:[30, .93], c1:[6, .85]};
+    const tok = COST_DEFAULT.rows;
+    const notes = {b1:['推荐了已经卖掉的车，车源表没更新','客户要七座，库里没有却没提示'], b2:['回复太长，客户不爱看','砍价话术太保守'], b4:['提成规则改了，知识库还是旧的'], b5:['新的活动用语词库没覆盖']};
+    for(const [k, [n, r]] of Object.entries(plan)){
+      for(let i = 0; i < n; i++){
+        const ts = now - Math.floor(Math.random() * 30) * day - Math.floor(Math.random() * day);
+        const t = tok[k] || [0, 1200, 500];
+        log.push({ts, tool:k, mode:'实时调用', masked: (k === 'b1' || k === 'b2' || k === 'b3') ? 1 + Math.floor(Math.random() * 2) : 0, types:'', maskOn:true, tin:t[1], tout:t[2], sim:true});
+        if(Math.random() < .45){ const v = Math.random() < r ? 'up' : 'down'; fbs.push({ts, tool:k, v, note: v === 'down' && notes[k] ? notes[k][Math.floor(Math.random() * notes[k].length)] : '', sim:true}); }
+      }
+    }
+    S.set('log', log.slice(-8000)); S.set('fb', fbs.slice(-8000)); this.render();
+  },
+  clear(btn){ confirmClick(btn, '再点一次确认清空', () => { S.set('log', []); S.set('fb', []); this.render(); toast('统计和反馈已清空'); }); }
+};
+
+/* ================= 设置 ================= */
+const Setting = {
+  load(){ $('sProv').value = S.get('prov', 'deepseek'); $('sBase').value = S.get('base', PROVIDERS.deepseek.base); $('sModel').value = S.get('model', PROVIDERS.deepseek.model); $('sKey').value = S.get('key', ''); },
+  save(){ S.set('prov', $('sProv').value); S.set('base', $('sBase').value.trim()); S.set('model', $('sModel').value.trim()); S.set('key', $('sKey').value.trim()); $('sOut').innerHTML = '<div class="mask-note">已保存，只存在这台电脑的浏览器里。</div>'; },
+  clearKey(){ S.set('key', ''); $('sKey').value = ''; $('sOut').innerHTML = '<div class="mask-note">Key 已清除。</div>'; },
+  async test(btn){
+    this.save();
+    await busy(btn, async () => {
+      try{ const t = await llm('你是测试助手。', '只回复两个字：成功', {json:false}); $('sOut').innerHTML = `<div class="mask-note">连接正常，模型回复：${esc(t.slice(0, 40))}</div>`; }
+      catch(e){ showErr($('sOut'), e); }
+    });
+  }
+};
+$('sProv').onchange = () => { const p = PROVIDERS[$('sProv').value]; if(p.base){ $('sBase').value = p.base; $('sModel').value = p.model; } };
+Setting.load();
+
+/* ================= 故事线 ================= */
+const STEPS = [
+  {tab:'a1', title:'入职第一周：先摸清各部门的痛点', say:'销售、车源、金融、人事、财务、市场各填了日常重复工作。系统算出每周耗时，AI 判断可行性，再乘以数据系数排序。“销售查车源”每周耗时最多、排第一；话术和金融涉及客户信息，排第二批。这就是我和老板一起定第一阶段优先级的方法。', fill:() => A1.fill(), btn:'a1run'},
+  {tab:'b1', title:'客户在微信上问车，销售 10 秒找到合适的车', say:'客户说预算 25-30 万、两个小孩、要 SUV、看重安全和后排空间、不要白色。系统先在本地按预算筛出在售车，再检索最匹配的 4 台，AI 只能从这 4 台里推荐。两台白色车被排除并说明了原因；车况和配置直接取自车源库，AI 改不了。客户姓名和电话已经脱敏。', fill:() => B1.fill(), btn:'b1run'},
+  {tab:'b2', title:'客户砍价，还担心是事故车', say:'客户说别家便宜两万、怕是事故车。系统检索到“嫌贵砍价”和“担心车况”两条标准话术，AI 写出可以直接发的回复：发检测报告、欢迎复检、帮申请店长特批，但不承诺具体优惠，也不说“绝对没问题”。', fill:() => B2.fill(), btn:'b2run'},
+  {tab:'b3', title:'客户问贷款：数字由程序算，AI 只解释', say:'月供、总利息由本地程序按等额本息算出，24、36、48 期一起对比。AI 拿到算好的数字，只负责写成客户听得懂的话，并提醒“以审批为准”。这样数字永远不会算错，也避免了“包过”这类违规说法。', fill:() => B3.fill(), btn:'b3run'},
+  {tab:'b4', title:'新销售问：优惠 8000 能不能直接答应？', say:'制度机器人检索到“优惠审批”“销售提成”“金融奖励”三条制度，只根据这三条回答并标注出处：8000 元需要店长审批，不能先口头承诺。知识库没写的，机器人会直接说不知道、转人事。', fill:() => B4.fill(), btn:'b4run'},
+  {tab:'b5', title:'市场要发 XC60 的朋友圈文案', say:'第一道本地禁用词扫描，不花一分钱就标出了“最低价”“包过”“绝对无事故”等问题；第二道 AI 按 6 条规则逐条审核，给出保留卖点的合规改写版本。', fill:() => B5.fill(), btn:'b5run'},
+  {tab:'b6', title:'一天结束，自动生成销售日报', say:'进店和线索涨了 60% 以上，订单反而降了，金融渗透率掉了 38%。AI 没有只盯着涨幅最大的数字，而是找出对成交影响最大的三个异动，推测原因并给出明天的动作，直接发到企业微信群。', fill:() => B6.fill(), btn:'b6run'},
+  {tab:'d1', title:'算一笔账：这些工具一个月要花多少 API 费', say:'按每个工具每天的调用量和 token 估算，全部工具一个月的 API 费用很低。点“对比”可以看到：如果不做本地检索、把整张车源表和员工手册都塞给 AI，成本会翻好几倍，而且更容易编造。能本地做的都不调用 AI，是我控制成本的第一原则。', fill:() => D1.reset(), btn:null},
+  {tab:'e1', title:'最后看效果：用数据决定下一轮优化什么', say:'每个工具都有“有用 / 没用”按钮，看板汇总调用量、采纳率、节省工时和 API 花费。点“运行这一步”会填入模拟 30 天的数据：采纳率最低的工具、最常见的“没用”原因，就是下一轮迭代的方向。', fill:() => {}, btn:'e1sim'}
+];
+const Story = {
+  i: -1,
+  start(){ this.i = 0; $('story').classList.add('on'); this.show(); },
+  show(){
+    const s = STEPS[this.i];
+    $('stStep').textContent = `故事线 ${this.i + 1} / ${STEPS.length}`; $('stTitle').textContent = s.title; $('stSay').textContent = s.say;
+    $('stDots').innerHTML = STEPS.map((_, j) => `<span class="${j <= this.i ? 'on' : ''}"></span>`).join('');
+    $('stPrev').disabled = this.i === 0; $('stNext').textContent = this.i === STEPS.length - 1 ? '完成' : '下一步';
+    $('stRun').style.display = s.btn ? '' : 'none';
+    go(s.tab); s.fill();
+  },
+  next(){ if(this.i < STEPS.length - 1){ this.i++; this.show(); } else this.exit(); },
+  prev(){ if(this.i > 0){ this.i--; this.show(); } },
+  run(){
+    const s = STEPS[this.i]; if(!s.btn) return;
+    $(s.btn).click();
+    const out = $(s.tab + 'out') || $(s.tab + 'kpi');
+    if(out) setTimeout(() => out.scrollIntoView({behavior:'smooth', block:'start'}), 150);
+  },
+  exit(){ this.i = -1; $('story').classList.remove('on'); },
+  exitIfOff(tab){ if(this.i >= 0 && STEPS[this.i].tab !== tab) this.exit(); }
+};
+$('storyBtn').onclick = () => Story.start();
+$('stNext').onclick = () => Story.next(); $('stPrev').onclick = () => Story.prev(); $('stRun').onclick = () => Story.run(); $('stExit').onclick = () => Story.exit();
+
+/* ================= 启动 ================= */
+go(S.get('tab', 'home'));
+
+</script>
+</body>
+</html>
